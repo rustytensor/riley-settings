@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- From Riley settings/tests/gate_m7.py check 1: core.render_idle({"lock": 600, "screens_off": 900, "sleep": 3600}).
+     Expected: expected-m7-idle.conf. The Python dict has no screensaver, which render_idle reads as 0 (never);
+     it is written out here so the case does not depend on the description's default. -->
+<settings version="1">
+  <value key="power.screensaver_after">0</value>
+  <value key="power.lock_after">600</value>
+  <value key="power.screens_off_after">900</value>
+  <value key="power.sleep_after">3600</value>
+</settings>

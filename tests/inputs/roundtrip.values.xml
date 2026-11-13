@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Hand-written for the round-trip check in tests/run-config.sh.
+     The gate runs: riley-config set <copy> power.lock_after 900
+     and expects exactly tests/expected/roundtrip.values.xml: only that value differs. -->
+<settings   version = "1" >
+
+	<!-- a tab-indented comment before the first value -->
+  <value key="appearance.gaps_in">8</value>
+      <value
+          key='input.kb_layout'>us,ro</value>
+
+
+  <value key="power.lock_after">600</value><!-- comment on the same line -->
+  <value key="old.removed_key">kept, not dropped</value>   <!-- a key the description does not know -->
+  <value key="startup.apps">
+    <!-- a comment inside a list -->
+    <item name="Slack"   exec="flatpak run com.slack.Slack" enabled="true" />
+    <item name="Notes" exec="gnome-text-editor &quot;/home/marcm/notes today.txt&quot;"/>
+  </value>
+  <value key="input.kb_options"></value>
+</settings>
+<!-- a comment after the root element -->

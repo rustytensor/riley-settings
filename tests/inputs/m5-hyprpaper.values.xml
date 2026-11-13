@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- From Riley settings/tests/gate_m5.py check 2: in a throwaway home with current-background /srv/pictures/theme.jpg,
+     hypr-theme.py drops /srv/pictures/a.jpg on the Samsung ...237 screen, then /srv/pictures/b.jpg on the Dell
+     (bin/hypr-theme.py set_bg, options bg and screen). Expected: expected-m5-hyprpaper.conf.
+     set_bg writes one block per screen that "hyprctl monitors -j" listed on the live desktop, in that order. The gate
+     has no fixture for that list: it is taken from the expected file itself (five screens, all on, in this order). -->
+<settings version="1">
+  <value key="display.monitors">
+    <item desc="Samsung Electric Company S34C65xU HCNYB00237"/>
+    <item desc="GWD ARZOPA 0x37330206"/>
+    <item desc="Samsung Electric Company S34C65xU HCNYB00019"/>
+    <item desc="Dell Inc. DELL U2515H YKFWP4CC09VL"/>
+    <item desc="GWD ARZOPA 0000001504150"/>
+  </value>
+  <value key="wallpaper.picture">/srv/pictures/theme.jpg</value>
+  <value key="wallpaper.screens">
+    <item screen="Samsung Electric Company S34C65xU HCNYB00237" path="/srv/pictures/a.jpg"/>
+    <item screen="Dell Inc. DELL U2515H YKFWP4CC09VL" path="/srv/pictures/b.jpg"/>
+  </value>
+</settings>
