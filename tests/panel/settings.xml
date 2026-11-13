@@ -46,7 +46,7 @@
     </section>
   </page>
 
-  <page id="custom" title="Custom" order="30" widget="displays" help="Drawn by its own component (M3); a placeholder in M2.">
+  <page id="custom" title="Custom" order="30" widget="m2-placeholder" help="A widget the build has no component for: a placeholder (M2; from M3 on, displays is a real component).">
     <option key="display.monitors" label="Screens" type="list" target="hyprpaper" action="greeter-sync desktop-reload">
       <field name="desc" type="text" label="Screen"/>
       <field name="enabled" type="switch" default="true" label="Use this screen"/>

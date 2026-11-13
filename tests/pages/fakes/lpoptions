@@ -1,0 +1,14 @@
+#!/bin/bash
+# Fake lpoptions: `-p QUEUE` lists the queue's options (plus your own print-color-mode once set), `-p QUEUE -o K=V`
+# sets one of yours, `-d QUEUE` makes it your default. It never writes ~/.cups/lpoptions.
+. "$(dirname "$0")/_common.sh"
+case "$*" in
+    "-p Office") cat "$D/canned/lpoptions-p-Office.txt" ;;
+    "-p RileyGate")
+        if [ -e "$D/state/options-RileyGate" ]; then
+            sed "s/^copies=1 /copies=1 $(cat "$D/state/options-RileyGate") /" "$D/canned/lpoptions-p-RileyGate.txt"
+        else cat "$D/canned/lpoptions-p-RileyGate.txt"; fi ;;
+    "-p RileyGate -o print-color-mode=monochrome") echo "print-color-mode=monochrome" >"$D/state/options-RileyGate" ;;
+    "-d RileyGate"|"-d Office") echo "$2" >"$D/state/default" ;;
+    *) unexpected "$@" ;;
+esac

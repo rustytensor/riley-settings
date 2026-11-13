@@ -1,0 +1,7 @@
+#!/bin/bash
+# Fake cancel: `cancel RileyGate-12` removes the held test page.
+. "$(dirname "$0")/_common.sh"
+case "$*" in
+    RileyGate-12) rm -f "$D/state/job-RileyGate" ;;
+    *) unexpected "$@" ;;
+esac

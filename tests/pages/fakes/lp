@@ -1,0 +1,9 @@
+#!/bin/bash
+# Fake lp: `lp -d QUEUE -t TITLE FILE` queues a job and prints its request id (RileyGate-12, Office-13).
+. "$(dirname "$0")/_common.sh"
+[ $# = 5 ] && [ "$1" = -d ] && [ "$3" = -t ] || unexpected "$@"
+case $2 in
+    RileyGate) touch "$D/state/job-RileyGate"; echo "request id is RileyGate-12 (1 file(s))" ;;
+    Office) echo "request id is Office-13 (1 file(s))" ;;
+    *) unexpected "$@" ;;
+esac

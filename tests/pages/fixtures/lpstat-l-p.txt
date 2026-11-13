@@ -1,0 +1,42 @@
+printer Office is idle.  enabled since Thu 12 Nov 2026 07:00:00 PM EST
+	Form mounted:
+	Content types: any
+	Printer types: unknown
+	Description: Office laser
+	Alerts: none
+	Location: Upstairs
+	Connection: direct
+	Interface: ipp://192.0.2.10/ipp/print
+	On fault: no alert
+	After fault: continue
+	Users allowed:
+		(all)
+	Forms allowed:
+		(none)
+	Banner required
+	Charset sets:
+		(none)
+	Default pitch:
+	Default page size:
+	Default port settings:
+printer RileyGate is idle.  enabled since Thu 12 Nov 2026 07:00:00 PM EST
+	Form mounted:
+	Content types: any
+	Printer types: unknown
+	Description: Riley gate queue
+	Alerts: none
+	Location: Riley gate
+	Connection: direct
+	Interface: lpd://127.0.0.1:9/q
+	On fault: no alert
+	After fault: continue
+	Users allowed:
+		(all)
+	Forms allowed:
+		(none)
+	Banner required
+	Charset sets:
+		(none)
+	Default pitch:
+	Default page size:
+	Default port settings:

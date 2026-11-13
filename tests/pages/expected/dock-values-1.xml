@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Seed for the M3 gate's dock group: Riley settings/tests/gate_m6.py's starting pins. -->
+<settings version="1">
+  <value key="dock.pins">
+    <item app="firefox"/>
+    <item app="org.kde.dolphin"/>
+    <item app="riley.settings"/>
+    <item app="org.gnome.Ptyxis"/>
+  </value>
+</settings>

@@ -1,0 +1,31 @@
+{
+  "boxes": [
+    {
+      "folder": "@HOME@/Desktop",
+      "screen": "Samsung Electric Company S34C65xU HCNYB00237",
+      "x": 48,
+      "y": 72,
+      "w": 440,
+      "h": 320,
+      "auto": true
+    },
+    {
+      "folder": "@HOME@/Desktop/Projects",
+      "screen": "Samsung Electric Company S34C65xU HCNYB00237",
+      "x": 48,
+      "y": 408,
+      "w": 340,
+      "h": 240,
+      "auto": true,
+      "hidden": true
+    },
+    {
+      "folder": "@HOME@/Downloads",
+      "screen": "Samsung Electric Company S34C65xU HCNYB00237",
+      "x": 48,
+      "y": 664,
+      "w": 340,
+      "h": 240
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+#!/bin/bash
+# Fake Hyprland: only `Hyprland --verify-config -c FILE`. Keeps a copy of each candidate as verify-N.lua and answers
+# "config ok", or a refusal while $RILEY_FAKE_DIR/state/verify-fail exists.
+. "$(dirname "$0")/_common.sh"
+[ $# = 3 ] && [ "$1" = --verify-config ] && [ "$2" = -c ] || unexpected "$@"
+n=$(ls "$D"/verify-*.lua 2>/dev/null | wc -l)
+cp -- "$3" "$D/verify-$((n + 1)).lua" 2>/dev/null
+if [ -e "$D/state/verify-fail" ]; then
+    echo "Config error in file $3 at line 5: the M3 gate's fake Hyprland refuses this candidate"
+    exit 1
+fi
+echo "config ok"

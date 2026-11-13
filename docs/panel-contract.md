@@ -49,6 +49,8 @@ Opening the panel writes nothing. Nothing else in the home is read or written.
 - A drawn page shows its sections, in file order, and in each section one control per option, in file order.
 - A widget page (`widget="..."`) shows, in M2, only a plain placeholder with objectName
   **`placeholder:<widget>`**. Its options get no control: no item anywhere is named `option:<key>` for them.
+  From M3 on this holds for a widget the build has no component for; the test description's widget page is therefore
+  named `m2-placeholder` (it was `displays`, which M3 draws; see `docs/pages-contract.md`).
 - At the gate's window size (1280 x 1600) every control of the test description's pages is inside the window
   without scrolling.
 

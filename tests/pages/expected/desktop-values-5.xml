@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Riley settings: only what differs from the defaults. -->
+<settings version="1">
+  <value key="desktop.icon_size">56</value>
+</settings>

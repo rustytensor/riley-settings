@@ -1,0 +1,8 @@
+#!/bin/bash
+# Fake hyprctl: the screens of Riley's fixture-m1.json (fixtures/monitors-all.json, monitors.json). Nothing else.
+. "$(dirname "$0")/_common.sh"
+case "$*" in
+    "monitors all -j") cat "$D/canned/monitors-all.json" ;;
+    "monitors -j") cat "$D/canned/monitors.json" ;;
+    *) unexpected "$@" ;;
+esac

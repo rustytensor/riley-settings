@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Riley settings: only what differs from the defaults. -->
+<settings version="1">
+  <value key="desktop.boxes">
+    <item folder="@HOME@/Downloads" screen="Samsung Electric Company S34C65xU HCNYB00237" hidden="false"/>
+  </value>
+</settings>

@@ -1,0 +1,84 @@
+[
+    {
+        "id": 0,
+        "name": "DP-3",
+        "description": "Dell Inc. DELL U2515H YKFWP4CC09VL",
+        "make": "Dell Inc.",
+        "model": "DELL U2515H",
+        "serial": "YKFWP4CC09VL",
+        "width": 2560,
+        "height": 1440,
+        "refreshRate": 59.95,
+        "x": 0,
+        "y": 0,
+        "scale": 1.0,
+        "transform": 3,
+        "disabled": false,
+        "availableModes": [
+            "2560x1440@59.95Hz",
+            "1920x1080@60.00Hz"
+        ]
+    },
+    {
+        "id": 1,
+        "name": "DP-1",
+        "description": "Samsung Electric Company S34C65xU HCNYB00237",
+        "make": "Samsung Electric Company",
+        "model": "S34C65xU",
+        "serial": "HCNYB00237",
+        "width": 3440,
+        "height": 1440,
+        "refreshRate": 59.97,
+        "x": 1440,
+        "y": 407,
+        "scale": 1.0,
+        "transform": 0,
+        "disabled": false,
+        "availableModes": [
+            "3440x1440@59.97Hz",
+            "3440x1440@49.99Hz",
+            "2560x1440@59.95Hz"
+        ]
+    },
+    {
+        "id": 2,
+        "name": "DP-2",
+        "description": "Samsung Electric Company S34C65xU HCNYB00019",
+        "make": "Samsung Electric Company",
+        "model": "S34C65xU",
+        "serial": "HCNYB00019",
+        "width": 3440,
+        "height": 1440,
+        "refreshRate": 59.97,
+        "x": 4880,
+        "y": 407,
+        "scale": 1.0,
+        "transform": 0,
+        "disabled": false,
+        "availableModes": [
+            "3440x1440@59.97Hz",
+            "3440x1440@49.99Hz",
+            "2560x1440@59.95Hz"
+        ]
+    },
+    {
+        "id": 3,
+        "name": "HDMI-A-1",
+        "description": "GWD ARZOPA 0x37330206",
+        "make": "GWD",
+        "model": "ARZOPA",
+        "serial": "0x37330206",
+        "width": 2560,
+        "height": 1600,
+        "refreshRate": 60.0,
+        "x": 1440,
+        "y": 1847,
+        "scale": 1.5,
+        "transform": 0,
+        "disabled": false,
+        "availableModes": [
+            "2560x1600@60.00Hz",
+            "1920x1200@60.00Hz"
+        ]
+    }
+]

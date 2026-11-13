@@ -1,0 +1,11 @@
+#!/bin/bash
+# Fake lpstat (C locale): two queues, Office (the default) and RileyGate; RileyGate's held test page while it exists.
+. "$(dirname "$0")/_common.sh"
+case "$*" in
+    "-l -p") cat "$D/canned/lpstat-l-p.txt" ;;
+    "-a") cat "$D/canned/lpstat-a.txt" ;;
+    "-d") echo "system default destination: $(cat "$D/state/default" 2>/dev/null || echo Office)" ;;
+    "-l -o"|"-l -o RileyGate") [ -e "$D/state/job-RileyGate" ] && cat "$D/canned/lpstat-l-o-RileyGate.txt"; exit 0 ;;
+    "-l -o Office") exit 0 ;;
+    *) unexpected "$@" ;;
+esac

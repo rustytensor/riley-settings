@@ -83,7 +83,7 @@ declare -A SUM=(
     [values-11.xml]=c7f669d92efebcf47a80e5cea8fcbbacc27f0aef4585af6468401c6773e9e8de
     [values-12.xml]=35e0ed5f82c593a7b0f2807ce2188b4ffbfa8c4cb83400416208bf7ccb718052
 )
-DESC_SUM=a6e6e0f3f6b347ebe362614896d2c497c6963a6a29c8577e000af644e64500f7
+DESC_SUM=472486a7025a741025407a43c2e1c46f2973f1401cb250a5b11ef13ec59c0d40   # widget renamed to m2-placeholder for M3 (docs/pages-contract.md)
 for f in $(printf '%s\n' "${!SUM[@]}" | sort); do
     got=$(sha256sum "$EXPECTED/$f" 2>/dev/null | cut -d' ' -f1)
     if [ "$got" = "${SUM[$f]}" ]; then pass "panel/expected/$f unchanged (sha256)"

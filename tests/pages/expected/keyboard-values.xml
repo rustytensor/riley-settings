@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Seed for the M3 gate's keyboard-mouse group: Riley settings/tests/fixture-m3.json, its input section at the
+     defaults; the gate changes them on the page to fixture-m3's values. -->
+<settings version="1">
+  <value key="display.monitors">
+    <item desc="Dell Inc. DELL U2515H YKFWP4CC09VL" enabled="true" mode="2560x1440@59.95" x="0" y="0" scale="1.0" transform="3"/>
+    <item desc="Samsung Electric Company S34C65xU HCNYB00237" enabled="true" mode="3440x1440@59.97" x="1440" y="407" scale="1.0" transform="0"/>
+    <item desc="Samsung Electric Company S34C65xU HCNYB00019" enabled="true" mode="3440x1440@59.97" x="4880" y="407" scale="1.0" transform="0"/>
+    <item desc="GWD ARZOPA 0x37330206" enabled="true" mode="2560x1600@60.00" x="1440" y="1847" scale="1.5" transform="0"/>
+    <item desc="GWD ARZOPA 0000001504150" enabled="false" mode="2560x1600@60.00" x="4495" y="1847" scale="1.25" transform="0"/>
+  </value>
+  <value key="appearance.gaps_in">8</value>
+  <value key="appearance.gaps_out">20</value>
+  <value key="appearance.border_size">3</value>
+  <value key="appearance.rounding">14</value>
+  <value key="appearance.active_opacity">1.0</value>
+  <value key="appearance.inactive_opacity">0.9</value>
+  <value key="appearance.blur">true</value>
+  <value key="appearance.blur_size">8</value>
+  <value key="appearance.blur_passes">3</value>
+  <value key="appearance.shadow">true</value>
+  <value key="appearance.animations">false</value>
+  <value key="input.kb_layout">us,ro</value>
+  <value key="input.kb_variant">,std</value>
+  <value key="input.kb_options">grp:alt_shift_toggle</value>
+  <value key="input.repeat_rate">30</value>
+  <value key="input.repeat_delay">400</value>
+  <value key="input.sensitivity">-0.2</value>
+  <value key="input.accel_profile">flat</value>
+  <value key="input.natural_scroll">false</value>
+  <value key="input.follow_mouse">1</value>
+</settings>

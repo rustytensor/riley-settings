@@ -364,8 +364,8 @@ private Q_SLOTS:
         }
         QString why;
         bool shown = showPage(QStringLiteral("custom"), &why);
-        QQuickItem* ph = shown ? visible(QStringLiteral("placeholder:displays"), &why) : nullptr;
-        check(QStringLiteral("pages: the widget page custom shows placeholder:displays"), ph, why);
+        QQuickItem* ph = shown ? visible(QStringLiteral("placeholder:m2-placeholder"), &why) : nullptr;
+        check(QStringLiteral("pages: the widget page custom shows placeholder:m2-placeholder"), ph, why);
         QVERIFY(m_failed == before);
     }
 

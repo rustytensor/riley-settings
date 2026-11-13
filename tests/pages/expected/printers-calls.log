@@ -1,0 +1,5 @@
+lp -d RileyGate -t Test\ page\ from\ Riley\ Settings /usr/share/cups/data/testprint
+cancel RileyGate-12
+lpoptions -p RileyGate -o print-color-mode=monochrome
+lpoptions -d RileyGate
+lpoptions -d Office

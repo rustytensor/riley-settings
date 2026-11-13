@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Seed for the M3 gate's wallpapers group: Riley settings/tests/fixture-m1.json's screens and the picture
+     that gate_m5.py's throwaway home starts with (current-background /srv/pictures/theme.jpg). -->
+<settings version="1">
+  <value key="display.monitors">
+    <item desc="Dell Inc. DELL U2515H YKFWP4CC09VL" enabled="true" mode="2560x1440@59.95" x="0" y="0" scale="1.0" transform="3"/>
+    <item desc="Samsung Electric Company S34C65xU HCNYB00237" enabled="true" mode="3440x1440@59.97" x="1440" y="407" scale="1.0" transform="0"/>
+    <item desc="Samsung Electric Company S34C65xU HCNYB00019" enabled="true" mode="3440x1440@59.97" x="4880" y="407" scale="1.0" transform="0"/>
+    <item desc="GWD ARZOPA 0x37330206" enabled="true" mode="2560x1600@60.00" x="1440" y="1847" scale="1.5" transform="0"/>
+    <item desc="GWD ARZOPA 0000001504150" enabled="false" mode="2560x1600@60.00" x="4495" y="1847" scale="1.25" transform="0"/>
+  </value>
+  <value key="wallpaper.picture">/srv/pictures/theme.jpg</value>
+  <value key="wallpaper.screens">
+    <item screen="Samsung Electric Company S34C65xU HCNYB00237" path="/srv/pictures/a.jpg"/>
+    <item screen="Dell Inc. DELL U2515H YKFWP4CC09VL" path="/srv/pictures/b.jpg"/>
+  </value>
+</settings>
