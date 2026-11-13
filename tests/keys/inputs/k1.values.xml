@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The keys brief's case: keys.agent_stop set, keys.sleep not set. Expected: expected/k1.keys-user.lua, the brief's
+     file with one line (written by hand from /srv/devops/agent-briefs/2026-11-13-riley-settings-keys.md). -->
+<settings version="1">
+  <value key="keys.agent_stop">SUPER+ALT+Escape</value>
+</settings>

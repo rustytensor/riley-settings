@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Both keys set, in the reverse of the description's order; keys.sleep holds a double quote and a backslash, which
+     a Lua string must escape (\" and \\). Expected: expected/k2.keys-user.lua, written by hand: description order,
+     one line per key. -->
+<settings version="1">
+  <value key="keys.sleep">SUPER+CTRL+&quot;x\</value>
+  <value key="keys.agent_stop">SUPER+SHIFT+Escape</value>
+</settings>

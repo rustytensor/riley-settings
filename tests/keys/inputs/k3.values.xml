@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- No key set: every binding is Riley's default, so the file must not exist (keys.lua: a missing file keeps the
+     defaults). An older keys-user.lua is removed. -->
+<settings version="1">
+  <value key="power.lock_after">600</value>
+</settings>
