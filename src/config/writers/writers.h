@@ -11,6 +11,7 @@ std::unique_ptr<Writer> makeHyprlandLua();   // hyprland-lua.cpp: ~/.config/hypr
 std::unique_ptr<Writer> makeHypridle();      // hypridle.cpp: ~/.config/hypr/idle.conf
 std::unique_ptr<Writer> makeHyprpaper();     // hyprpaper.cpp: ~/.config/hypr/hyprpaper.conf
 std::unique_ptr<Writer> makeGreeterSway();   // greeter-sway.cpp: the login screen's sway file
+std::unique_ptr<Writer> makeRileyModel();    // riley-model.cpp: ~/.config/hypr/settings.json, Riley's model
 std::unique_ptr<Writer> makeRileyDock();     // riley-dock.cpp: the dock's pins file and riley.conf (own files)
 std::unique_ptr<Writer> makeRileyDesktop();  // riley-desktop.cpp: ~/.config/riley/desktop.json (own file)
 

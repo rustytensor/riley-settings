@@ -24,25 +24,10 @@ void printErr(const QString& line)
     std::fprintf(stderr, "riley-settings: %s\n", line.toUtf8().constData());
 }
 
-// Where each target with a writer is written, under $XDG_CONFIG_HOME. A target not listed here has no file yet.
-struct TargetFile {
-    const char* target;
-    const char* file;
-};
-constexpr TargetFile kTargetFiles[] = {
-    {"hypridle", "hypr/idle.conf"},
-    {"hyprpaper", "hypr/hyprpaper.conf"},
-    {"hyprland-lua", "hypr/settings.lua"},
-    {"greeter-sway", "riley/greeter-sway.conf"},   // riley-greeter-sync installs it for the login screen
-};
-
+// Where each single-file target is written, under $XDG_CONFIG_HOME (config::targetFileName). Empty: no file.
 QString targetFile(const QString& target)
 {
-    for (const auto& t : kTargetFiles) {
-        if (target == QLatin1String(t.target))
-            return QString::fromLatin1(t.file);
-    }
-    return {};
+    return config::targetFileName(target);
 }
 
 // What each action runs with --apply-actions: one fixed argv, never a shell line. An empty argv runs nothing

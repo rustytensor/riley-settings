@@ -2,6 +2,7 @@
 // Port of Riley's bin/hypr-theme.py set_bg: with no per-screen picture, one catch-all block with wallpaper.picture;
 // otherwise one block per enabled screen of display.monitors, in list order, each with its picture from
 // wallpaper.screens or else wallpaper.picture (a later entry for the same screen wins, as in the Python dict).
+// With neither set, the file is left as it is (the theme's).
 #include "writers.h"
 
 #include <QHash>
@@ -12,6 +13,14 @@ namespace {
 class Hyprpaper final : public Writer {
 public:
     QString target() const override { return QStringLiteral("hyprpaper"); }
+
+    // No picture and no screen of its own: the theme decides the wallpapers (hypr-theme.py set_wallpapers), so its
+    // hyprpaper.conf is left as it is (docs/switch-contract.md).
+    bool leavesFileAlone(const Config& config) const override
+    {
+        return config.text(QStringLiteral("wallpaper.picture")).isEmpty()
+            && config.list(QStringLiteral("wallpaper.screens")).isEmpty();
+    }
 
     bool render(const Config& config, const QByteArray* existing, QByteArray* out, QString* error) const override
     {

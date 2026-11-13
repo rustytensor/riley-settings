@@ -55,6 +55,7 @@
       <xs:enumeration value="hypridle"/>       <!-- ~/.config/hypr/idle.conf -->
       <xs:enumeration value="hyprpaper"/>      <!-- ~/.config/hypr/hyprpaper.conf -->
       <xs:enumeration value="greeter-sway"/>   <!-- the login screen's sway file -->
+      <xs:enumeration value="riley-model"/>    <!-- ~/.config/hypr/settings.json, Riley's model (the greeter follows it) -->
       <xs:enumeration value="riley-dock"/>     <!-- the dock's config and pinned apps -->
       <xs:enumeration value="riley-desktop"/>  <!-- ~/.config/riley/desktop.json -->
       <xs:enumeration value="theme"/>          <!-- the current theme (hypr-theme) -->

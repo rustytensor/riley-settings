@@ -177,7 +177,11 @@ public:
                 Node* node = &top;
                 for (int i = 0; i + 1 < path.size(); ++i)
                     node = node->child(path[i]);
-                Node leaf{path.last(), luaValue(config, *config.option(key)), true, {}};
+                QString value = luaValue(config, *config.option(key));
+                // Riley writes Hyprland's own acceleration ("adaptive") as "", its value for it.
+                if (key == QLatin1String("input.accel_profile") && config.text(key) == QLatin1String("adaptive"))
+                    value = luaString(QString());
+                Node leaf{path.last(), value, true, {}};
                 node->children.push_back(leaf);
             }
             if (top.children.empty())

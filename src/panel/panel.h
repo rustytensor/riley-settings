@@ -9,7 +9,7 @@ namespace riley::panel {
 
 struct LoadOptions {
     bool applyActions = false;   // true only from --apply-actions (M4's launcher)
-    QString descriptionPath;     // empty: $RILEY_SETTINGS_SHARE/settings.xml (default: the installed share directory)
+    QString descriptionPath;     // empty: $RILEY_SETTINGS_SHARE/settings.xml (default: <program dir>/../share/riley-settings)
     QString valuesPath;          // empty: $XDG_CONFIG_HOME/riley/settings.xml (default: ~/.config/riley/settings.xml)
 };
 

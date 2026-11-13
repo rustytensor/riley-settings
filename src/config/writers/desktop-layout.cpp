@@ -5,9 +5,11 @@
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonDocument>
+#include <QLocale>
 #include <QRegularExpression>
 
 #include <algorithm>
+#include <cmath>
 #include <variant>
 
 namespace riley::config::desktop {
@@ -187,20 +189,95 @@ QJsonObject load(const QString& path)
     return empty;
 }
 
+namespace {
+
+// A JSON string as Python's json.dumps writes it (ensure_ascii).
+QByteArray pyString(const QString& text)
+{
+    QByteArray out = "\"";
+    for (const QChar c : text) {
+        const ushort u = c.unicode();
+        switch (u) {
+        case '"': out += "\\\""; break;
+        case '\\': out += "\\\\"; break;
+        case '\n': out += "\\n"; break;
+        case '\r': out += "\\r"; break;
+        case '\t': out += "\\t"; break;
+        case '\b': out += "\\b"; break;
+        case '\f': out += "\\f"; break;
+        default:
+            if (u < 0x20 || u > 0x7e)
+                out += "\\u" + QByteArray::number(u, 16).rightJustified(4, '0');
+            else
+                out += char(u);
+        }
+    }
+    return out + '"';
+}
+
+// The order Riley's layout.py gives the keys (the order its dicts are made in): a box's folder, screen, x, y, w, h,
+// auto, hidden; the file's boxes, show, icon_size. Any other key follows, by name.
+QStringList orderedKeys(const QJsonObject& o, bool box)
+{
+    static const QStringList boxOrder = {s("folder"), s("screen"), s("x"), s("y"), s("w"), s("h"), s("auto"),
+                                         s("hidden")};
+    static const QStringList topOrder = {s("boxes"), s("show"), s("icon_size")};
+    QStringList keys;
+    for (const QString& k : box ? boxOrder : topOrder) {
+        if (o.contains(k))
+            keys.append(k);
+    }
+    for (const QString& k : o.keys()) {   // QJsonObject's keys are sorted
+        if (!keys.contains(k))
+            keys.append(k);
+    }
+    return keys;
+}
+
+// json.dumps(value, indent=2) for what desktop.json holds.
+QByteArray pyDump(const QJsonValue& v, const QByteArray& indent, bool box)
+{
+    const QByteArray inner = indent + "  ";
+    switch (v.type()) {
+    case QJsonValue::Bool:
+        return v.toBool() ? "true" : "false";
+    case QJsonValue::Double: {
+        const double d = v.toDouble();
+        if (d == std::trunc(d) && std::fabs(d) < 9.0e15)
+            return QByteArray::number(static_cast<qint64>(d));
+        return QByteArray::number(d, 'g', QLocale::FloatingPointShortest);
+    }
+    case QJsonValue::String:
+        return pyString(v.toString());
+    case QJsonValue::Array: {
+        const QJsonArray a = v.toArray();
+        if (a.isEmpty())
+            return "[]";
+        QByteArrayList parts;
+        for (const QJsonValue& e : a)
+            parts << inner + pyDump(e, inner, true);   // the arrays of desktop.json hold boxes
+        return "[\n" + parts.join(",\n") + "\n" + indent + "]";
+    }
+    case QJsonValue::Object: {
+        const QJsonObject o = v.toObject();
+        if (o.isEmpty())
+            return "{}";
+        QByteArrayList parts;
+        for (const QString& k : orderedKeys(o, box))
+            parts << inner + pyString(k) + ": " + pyDump(o.value(k), inner, false);
+        return "{\n" + parts.join(",\n") + "\n" + indent + "}";
+    }
+    default:
+        return "null";
+    }
+}
+
+}  // namespace
+
 QByteArray toText(const QJsonObject& cfg)
 {
-    // Riley writes json.dumps(indent=2); Qt indents by 4. Both read alike; keep Riley's look.
-    const QByteArray four = QJsonDocument(cfg).toJson(QJsonDocument::Indented);
-    QByteArray out;
-    for (const QByteArray& line : four.split('\n')) {
-        qsizetype n = 0;
-        while (n < line.size() && line[n] == ' ')
-            ++n;
-        out += QByteArray(n / 2, ' ') + line.mid(n) + '\n';
-    }
-    while (out.endsWith("\n\n"))
-        out.chop(1);
-    return out;
+    // Riley's layout.py save: json.dumps(cfg, indent=2) + "\n", its keys in the order Riley makes them.
+    return pyDump(cfg, QByteArray(), false) + '\n';
 }
 
 QPoint freeSpot(int w, int h, const QList<QRect>& taken, QSize screen)

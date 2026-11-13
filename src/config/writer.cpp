@@ -18,6 +18,7 @@ const std::vector<std::unique_ptr<Writer>>& registry()
         w.push_back(writers::makeHypridle());
         w.push_back(writers::makeHyprpaper());
         w.push_back(writers::makeGreeterSway());
+        w.push_back(writers::makeRileyModel());
         w.push_back(writers::makeRileyDock());
         w.push_back(writers::makeRileyDesktop());
         return w;
@@ -25,10 +26,35 @@ const std::vector<std::unique_ptr<Writer>>& registry()
     return writers;
 }
 
+// Where each single-file target is written, under $XDG_CONFIG_HOME.
+struct TargetFile {
+    const char* target;
+    const char* file;
+};
+constexpr TargetFile kTargetFiles[] = {
+    {"hypridle", "hypr/idle.conf"},
+    {"hyprpaper", "hypr/hyprpaper.conf"},
+    {"hyprland-lua", "hypr/settings.lua"},
+    // Riley's model: the GTK panel's own file, which riley-greeter-sync.path watches for the login screen.
+    {"riley-model", "hypr/settings.json"},
+    {"greeter-sway", "riley/greeter-sway.conf"},   // riley-config and the M1 gate only; no option names it
+};
+
 }  // namespace
+
+QString targetFileName(const QString& target)
+{
+    for (const auto& t : kTargetFiles) {
+        if (target == QLatin1String(t.target))
+            return QString::fromLatin1(t.file);
+    }
+    return {};
+}
 
 bool Writer::write(const Config& config, const QString& outPath, const QByteArray* existing, QString* error) const
 {
+    if (leavesFileAlone(config))
+        return true;
     QByteArray text;
     if (!render(config, existing, &text, error))
         return false;

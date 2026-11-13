@@ -126,6 +126,12 @@ public:
 
     bool writesOwnFiles() const override { return true; }
 
+    QStringList ownFiles(const WriteContext& context) const override
+    {
+        return {context.cacheHome + QStringLiteral("/nwg-dock-pinned"),
+                context.configHome + QStringLiteral("/nwg-dock-hyprland/riley.conf")};
+    }
+
     bool writeFiles(const Config& config, const WriteContext& context, QString* error) const override
     {
         const auto changed = [&](const QString& key) { return context.changed.isEmpty() || context.changed.contains(key); };

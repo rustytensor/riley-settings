@@ -34,6 +34,11 @@ public:
 
     bool writesOwnFiles() const override { return true; }
 
+    QStringList ownFiles(const WriteContext& context) const override
+    {
+        return {context.configHome + QStringLiteral("/riley/desktop.json")};
+    }
+
     bool writeFiles(const Config& config, const WriteContext& context, QString* error) const override
     {
         if (!config.require({SHOW, BOXES, ICON_SIZE}, error))

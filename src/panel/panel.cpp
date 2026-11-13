@@ -2,13 +2,10 @@
 
 #include "models.h"
 
+#include <QCoreApplication>
 #include <QDir>
 #include <QQuickWindow>
 #include <QtQml/qqmlextensionplugin.h>
-
-#ifndef RILEY_SETTINGS_SHARE_DIR
-#error "RILEY_SETTINGS_SHARE_DIR must be defined by the build"
-#endif
 
 // The QML module is a static plugin: bring it in here, so a program that links the library needs nothing else.
 Q_IMPORT_QML_PLUGIN(Riley_SettingsPlugin)
@@ -26,7 +23,11 @@ QString envOr(const char* name, const QString& fallback)
 
 bool load(QQmlApplicationEngine& engine, const LoadOptions& options, QString* error)
 {
-    const QString share = envOr("RILEY_SETTINGS_SHARE", QStringLiteral(RILEY_SETTINGS_SHARE_DIR));
+    // The share directory: $RILEY_SETTINGS_SHARE, else ../share/riley-settings next to the program (an installed
+    // prefix carries it along); no compiled-in path.
+    const QString share = envOr("RILEY_SETTINGS_SHARE",
+                                QDir::cleanPath(QCoreApplication::applicationDirPath()
+                                                + QStringLiteral("/../share/riley-settings")));
     const QString configHome = envOr("XDG_CONFIG_HOME", QDir::homePath() + QStringLiteral("/.config"));
 
     Paths paths;

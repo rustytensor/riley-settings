@@ -30,7 +30,7 @@ FocusScope {
         Label {
             Layout.preferredWidth: 180
             text: control.parts.family !== "" ? control.parts.family : qsTr("Theme font")
-            font.family: control.parts.family !== "" ? control.parts.family : control.font.family
+            font.family: control.parts.family !== "" ? control.parts.family : Qt.application.font.family
             elide: Text.ElideRight
         }
 
@@ -56,8 +56,9 @@ FocusScope {
     FontDialog {
         id: dialog
         title: control.option.label
-        selectedFont: Qt.font({family: control.parts.family || control.font.family,
-                               pointSize: control.parts.size > 0 ? control.parts.size : control.font.pointSize})
+        // A FocusScope has no font of its own: the application's font stands for the theme's.
+        selectedFont: Qt.font({family: control.parts.family || Qt.application.font.family,
+                               pointSize: control.parts.size > 0 ? control.parts.size : Qt.application.font.pointSize})
         onAccepted: control.commitValue(selectedFont.family + " " + Math.round(selectedFont.pointSize))
     }
 }
