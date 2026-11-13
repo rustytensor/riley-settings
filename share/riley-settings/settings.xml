@@ -1,0 +1,241 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Riley Settings: every page, section and option of the panel. Checked against schema/settings.xsd on every load.
+     A new, renamed, moved or removed setting is an edit to this file, not to the panel's code.
+     Pages with widget="..." are drawn by their own QML component; they hold only the options they store.
+     Taken from Riley's GTK panel (settings/riley_settings/*.py): its pages, in its sidebar order. -->
+<description version="1">
+
+  <page id="displays" title="Displays" order="10" icon="video-display-symbolic" widget="displays"
+        help="Drag a screen to move it; it snaps to the edge of its neighbour. Changes take effect when you press Apply.">
+    <option key="display.monitors" label="Screens"
+            help="Every screen by its description, in order. Apply checks the result first and undoes it by itself after 15 seconds unless you keep it."
+            type="list" target="hyprland-lua greeter-sway hyprpaper" action="hyprland-reload greeter-sync">
+      <field name="desc" type="text" label="Screen"/>
+      <field name="enabled" type="switch" default="true" label="Use this screen"/>
+      <field name="mode" type="text" label="Resolution and refresh rate" help="For example 2560x1440@59.95"/>
+      <field name="x" type="number" default="0" label="Left edge"/>
+      <field name="y" type="number" default="0" label="Top edge"/>
+      <field name="scale" type="number" default="1" min="0.25" max="4" label="Scale"/>
+      <field name="transform" type="choice" default="0" label="Rotation">
+        <choice value="0" label="Normal"/>
+        <choice value="1" label="90°"/>
+        <choice value="2" label="180°"/>
+        <choice value="3" label="270°"/>
+      </field>
+    </option>
+  </page>
+
+  <page id="printers" title="Printers" order="20" icon="printer-symbolic" widget="printers"
+        help="The printers CUPS knows, their queues and a test page. Network printers are usually found by themselves."/>
+
+  <page id="appearance" title="Appearance" order="30" icon="applications-graphics-symbolic"
+        help="Your desktop changes as you drag; changes save themselves.">
+    <section title="Windows">
+      <option key="appearance.gaps_in" label="Space between windows" type="slider" default="6" min="0" max="30" step="1"
+              target="hyprland-lua" action="hyprland-reload"/>
+      <option key="appearance.gaps_out" label="Space at the screen edges" type="slider" default="14" min="0" max="60" step="1"
+              target="hyprland-lua" action="hyprland-reload"/>
+      <option key="appearance.border_size" label="Border" help="The coloured frame; the active window gets the theme's gradient"
+              type="slider" default="2" min="0" max="8" step="1" target="hyprland-lua" action="hyprland-reload"/>
+      <option key="appearance.rounding" label="Rounded corners" type="slider" default="12" min="0" max="24" step="1"
+              target="hyprland-lua" action="hyprland-reload"/>
+      <option key="appearance.workspaces" label="Workspaces"
+              help="Tiled or floating windows; Super+Alt+T switches the workspace you are on"
+              type="choice" default="tiled" target="float-mode" action="none">
+        <choice value="tiled" label="Tiled"/>
+        <choice value="floating" label="Floating"/>
+      </option>
+    </section>
+    <section title="Transparency and effects">
+      <option key="appearance.active_opacity" label="Active window" help="How solid the window you are working in is"
+              type="slider" default="1.0" min="0.5" max="1.0" step="0.01" target="hyprland-lua" action="hyprland-reload"/>
+      <option key="appearance.inactive_opacity" label="Other windows"
+              help="Lower lets the wallpaper show through the windows you are not using"
+              type="slider" default="0.94" min="0.5" max="1.0" step="0.01" target="hyprland-lua" action="hyprland-reload"/>
+      <option key="appearance.blur" label="Frosted glass" help="Blur behind see-through windows, the bar and menus"
+              type="switch" default="true" target="hyprland-lua" action="hyprland-reload"/>
+      <option key="appearance.blur_size" label="Strength" type="slider" default="7" min="1" max="20" step="1"
+              target="hyprland-lua" action="hyprland-reload"/>
+      <option key="appearance.blur_passes" label="Smoothness" help="More is smoother and costs a little more GPU"
+              type="slider" default="3" min="1" max="4" step="1" target="hyprland-lua" action="hyprland-reload"/>
+      <option key="appearance.shadow" label="Shadows" help="A soft shadow under every window"
+              type="switch" default="true" target="hyprland-lua" action="hyprland-reload"/>
+      <option key="appearance.animations" label="Animations" help="Windows and workspaces glide instead of jumping"
+              type="switch" default="true" target="hyprland-lua" action="hyprland-reload"/>
+    </section>
+    <section title="Fonts" help="Your choices override the theme. Other theme settings and wallpapers stay as they are.">
+      <option key="fonts.sans" label="Interface font" help="Empty: the theme's own font"
+              type="font" default="" target="fonts" action="none"/>
+      <option key="fonts.mono" label="Monospace font" help="Empty: the theme's own font"
+              type="font" default="" target="fonts" action="none"/>
+      <option key="fonts.terminal_size" label="Terminal size" help="Points"
+              type="slider" default="11" min="6" max="48" step="1" target="fonts" action="none"/>
+    </section>
+    <section title="Weather" help="Empty location uses your public IP to guess the place. The bar refreshes every 15 minutes.">
+      <option key="weather.location" label="Location" type="text" default="" target="weather" action="none"/>
+      <option key="weather.units" label="Temperature" type="choice" default="C" target="weather" action="none">
+        <choice value="C" label="Celsius (°C)"/>
+        <choice value="F" label="Fahrenheit (°F)"/>
+      </option>
+    </section>
+  </page>
+
+  <page id="input" title="Keyboard and Mouse" order="40" icon="input-keyboard-symbolic" widget="keyboard-mouse"
+        help="Live as you change it; saves itself.">
+    <option key="input.kb_layout" label="Layout" help="One layout, or two separated by a comma (us,ro)"
+            type="text" default="us" target="hyprland-lua greeter-sway" action="hyprland-reload greeter-sync"/>
+    <option key="input.kb_variant" label="Layout variants" help="One per layout, separated by a comma"
+            type="text" default="" target="hyprland-lua" action="hyprland-reload"/>
+    <option key="input.kb_options" label="Keyboard options" help="For example grp:alt_shift_toggle: the key that switches layouts"
+            type="text" default="" target="hyprland-lua" action="hyprland-reload"/>
+    <option key="input.repeat_delay" label="Delay before repeating" help="Milliseconds you hold a key before it repeats"
+            type="slider" default="600" min="150" max="1000" step="10" target="hyprland-lua" action="hyprland-reload"/>
+    <option key="input.repeat_rate" label="Repeat speed" help="Repeats per second"
+            type="slider" default="25" min="10" max="60" step="1" target="hyprland-lua" action="hyprland-reload"/>
+    <option key="input.sensitivity" label="Pointer speed" help="0 is normal"
+            type="slider" default="0" min="-1" max="1" step="0.05" target="hyprland-lua" action="hyprland-reload"/>
+    <option key="input.accel_profile" label="Acceleration"
+            help="Faster movements go further; flat is better for precise work and games"
+            type="choice" default="adaptive" target="hyprland-lua" action="hyprland-reload">
+      <choice value="adaptive" label="On"/>
+      <choice value="flat" label="Off"/>
+      <choice value="custom" label="Custom"/>
+    </option>
+    <option key="input.natural_scroll" label="Natural scrolling" help="The content moves with your fingers, like a phone"
+            type="switch" default="false" target="hyprland-lua" action="hyprland-reload"/>
+    <option key="input.follow_mouse" label="Focus follows the mouse" help="Off: click a window to work in it"
+            type="choice" default="1" target="hyprland-lua" action="hyprland-reload">
+      <choice value="0" label="Off"/>
+      <choice value="1" label="On"/>
+      <choice value="2" label="Keyboard follows a click, the pointer moves freely"/>
+      <choice value="3" label="Keyboard and pointer apart"/>
+    </option>
+  </page>
+
+  <page id="theme" title="Theme and Wallpaper" order="50" icon="preferences-desktop-wallpaper-symbolic"
+        widget="theme-wallpaper"
+        help="Drag a picture onto a screen to use it there; click a picture to use it on every screen.">
+    <option key="theme.name" label="Theme"
+            help="Recolours the whole desktop: borders, bar, dock, menus, terminal, prompt, apps, and sets its wallpapers."
+            type="text" default="" target="theme" action="none"/>
+    <option key="wallpaper.picture" label="Wallpaper" help="The picture on every screen without its own"
+            type="file" default="" target="hyprpaper" action="hyprpaper-reload"/>
+    <option key="wallpaper.screens" label="Wallpaper per screen" help="A picture of its own for one screen"
+            type="list" target="hyprpaper" action="hyprpaper-reload">
+      <field name="screen" type="text" label="Screen"/>
+      <field name="path" type="file" label="Picture"/>
+    </option>
+  </page>
+
+  <page id="dock" title="Dock" order="60" icon="view-app-grid-symbolic" widget="dock"
+        help="Drag icons along the dock to arrange them. Drag an app onto the dock to add it; drag a dock icon onto Remove to take it off.">
+    <option key="dock.pins" label="Apps on the dock" help="In dock order, by app id" type="list"
+            target="riley-dock" action="dock-reload">
+      <field name="app" type="text" label="App"/>
+    </option>
+    <option key="dock.screens" label="Screens"
+            help="Choose screens by their descriptions, not their ports. If none match, the dock uses the top-left screen."
+            type="list" target="riley-dock" action="dock-reload">
+      <field name="desc" type="text" label="Screen"/>
+    </option>
+    <option key="dock.icon_size" label="Icon size" type="slider" default="44" min="28" max="64" step="2"
+            target="riley-dock" action="dock-reload"/>
+    <option key="dock.reflections" label="Reflections" help="Mirrored icons beneath the glass shelf"
+            type="switch" default="true" target="riley-dock" action="dock-reload"/>
+    <option key="dock.launcher" label="App grid button" type="choice" default="left" target="riley-dock" action="dock-reload">
+      <choice value="left" label="Left"/>
+      <choice value="right" label="Right"/>
+      <choice value="center" label="Centre"/>
+      <choice value="off" label="Hidden"/>
+    </option>
+    <option key="dock.autohide" label="Auto-hide"
+            help="Slide the dock down to a thin edge until the pointer rests on it. The dock follows this at once."
+            type="switch" default="false" target="riley-dock" action="none"/>
+  </page>
+
+  <page id="webapps" title="Web Apps" order="70" icon="web-browser-symbolic" widget="webapps"
+        help="Web apps in your normal Chrome Default profile. Removing an app keeps browsing data."/>
+
+  <page id="desktop" title="Desktop" order="80" icon="user-desktop-symbolic" widget="desktop"
+        help="~/Desktop and each folder in it get a box by themselves; Add Folder gives any other folder one. The desktop follows changes within a second.">
+    <option key="desktop.show" label="Boxes on the desktop" help="Frosted boxes showing your folders"
+            type="switch" default="true" target="riley-desktop" action="none"/>
+    <option key="desktop.boxes" label="Boxes" help="Move a box by its title, resize it by its corner; right-click it to send it to another screen."
+            type="list" target="riley-desktop" action="none">
+      <field name="folder" type="folder" label="Folder"/>
+      <field name="screen" type="text" label="Screen"/>
+      <field name="hidden" type="switch" default="false" label="Hidden"/>
+    </option>
+    <option key="desktop.icon_size" label="Icon size" type="slider" default="48" min="32" max="96" step="8"
+            target="riley-desktop" action="none"/>
+  </page>
+
+  <page id="startup" title="Startup Apps" order="90" icon="system-run-symbolic">
+    <section title="Start with Hyprland"
+             help="Your own apps, started when you log in. Changes take effect at the next login. The bar, dock, notifications and other desktop parts always start.">
+      <option key="startup.apps" label="Startup apps" type="list" target="hyprland-lua" action="none">
+        <field name="name" type="text" label="Name"/>
+        <field name="exec" type="text" label="Command"/>
+        <field name="enabled" type="switch" default="true" label="Start this app at login"/>
+      </option>
+    </section>
+  </page>
+
+  <page id="power" title="Power" order="100" icon="system-shutdown-symbolic">
+    <section title="When you're away"
+             help="How long the computer waits with no keyboard or mouse input. Changes take effect at once.">
+      <option key="power.screensaver_after" label="Start the screensaver" help="Text effects on every screen; any key or a click ends it"
+              type="choice" default="0" target="hypridle" action="hypridle-restart">
+        <choice value="0" label="Never"/>
+        <choice value="60" label="After 1 minute"/>
+        <choice value="120" label="After 2 minutes"/>
+        <choice value="180" label="After 3 minutes"/>
+        <choice value="300" label="After 5 minutes"/>
+        <choice value="600" label="After 10 minutes"/>
+        <choice value="900" label="After 15 minutes"/>
+        <choice value="1200" label="After 20 minutes"/>
+        <choice value="1800" label="After 30 minutes"/>
+      </option>
+      <option key="power.lock_after" label="Lock the screen" help="Your password brings it back"
+              type="choice" default="0" target="hypridle" action="hypridle-restart">
+        <choice value="0" label="Never"/>
+        <choice value="300" label="After 5 minutes"/>
+        <choice value="600" label="After 10 minutes"/>
+        <choice value="900" label="After 15 minutes"/>
+        <choice value="1200" label="After 20 minutes"/>
+        <choice value="1800" label="After 30 minutes"/>
+        <choice value="2700" label="After 45 minutes"/>
+        <choice value="3600" label="After 1 hour"/>
+        <choice value="7200" label="After 2 hours"/>
+      </option>
+      <option key="power.screens_off_after" label="Turn the screens off" help="Any key or mouse move turns them on"
+              type="choice" default="0" target="hypridle" action="hypridle-restart">
+        <choice value="0" label="Never"/>
+        <choice value="300" label="After 5 minutes"/>
+        <choice value="600" label="After 10 minutes"/>
+        <choice value="900" label="After 15 minutes"/>
+        <choice value="1200" label="After 20 minutes"/>
+        <choice value="1500" label="After 25 minutes"/>
+        <choice value="1800" label="After 30 minutes"/>
+        <choice value="2700" label="After 45 minutes"/>
+        <choice value="3600" label="After 1 hour"/>
+        <choice value="7200" label="After 2 hours"/>
+      </option>
+      <option key="power.sleep_after" label="Sleep" help="Agents, builds and downloads pause while it sleeps; the screen locks first"
+              type="choice" default="0" target="hypridle" action="hypridle-restart">
+        <choice value="0" label="Never"/>
+        <choice value="300" label="After 5 minutes"/>
+        <choice value="600" label="After 10 minutes"/>
+        <choice value="900" label="After 15 minutes"/>
+        <choice value="1800" label="After 30 minutes"/>
+        <choice value="3600" label="After 1 hour"/>
+        <choice value="7200" label="After 2 hours"/>
+        <choice value="10800" label="After 3 hours"/>
+        <choice value="14400" label="After 4 hours"/>
+      </option>
+    </section>
+  </page>
+
+  <page id="system" title="Network, Bluetooth, Sound, Users…" order="110" icon="preferences-system-symbolic"
+        widget="system-launcher" help="Opens the system's own settings (hypr-settings)."/>
+</description>

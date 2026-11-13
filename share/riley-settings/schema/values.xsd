@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The schema of your values (~/.config/riley/settings.xml): only what differs from the defaults, by key. XSD 1.0.
+     Which keys exist and what each value may hold is in the description; the loader checks that after this. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="key">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- One list item: one attribute per field of the option (checked against the description by the loader). -->
+  <xs:complexType name="item">
+    <xs:anyAttribute processContents="skip"/>
+  </xs:complexType>
+
+  <!-- A value: its text, or for a list a sequence of items. -->
+  <xs:complexType name="value" mixed="true">
+    <xs:sequence>
+      <xs:element name="item" type="item" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="key" type="key" use="required"/>
+  </xs:complexType>
+
+  <xs:element name="settings">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="value" type="value" minOccurs="0" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:positiveInteger" use="required"/>
+    </xs:complexType>
+    <xs:unique name="value-key">
+      <xs:selector xpath="value"/>
+      <xs:field xpath="@key"/>
+    </xs:unique>
+  </xs:element>
+</xs:schema>

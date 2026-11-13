@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The schema of the description (share/riley-settings/settings.xml): pages, sections, options. XSD 1.0.
+     What it cannot say, the loader checks after it: a default within min..max, a choice default among its choices. -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:simpleType name="optionType">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="switch"/>
+      <xs:enumeration value="choice"/>
+      <xs:enumeration value="slider"/>
+      <xs:enumeration value="number"/>
+      <xs:enumeration value="text"/>
+      <xs:enumeration value="colour"/>
+      <xs:enumeration value="font"/>
+      <xs:enumeration value="file"/>
+      <xs:enumeration value="folder"/>
+      <xs:enumeration value="keybinding"/>
+      <xs:enumeration value="list"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- The columns of a list item: every type but list. -->
+  <xs:simpleType name="fieldType">
+    <xs:restriction base="optionType">
+      <xs:enumeration value="switch"/>
+      <xs:enumeration value="choice"/>
+      <xs:enumeration value="slider"/>
+      <xs:enumeration value="number"/>
+      <xs:enumeration value="text"/>
+      <xs:enumeration value="colour"/>
+      <xs:enumeration value="font"/>
+      <xs:enumeration value="file"/>
+      <xs:enumeration value="folder"/>
+      <xs:enumeration value="keybinding"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- A stable key: lower case, dot-separated, at least two parts. -->
+  <xs:simpleType name="key">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="name">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-z][a-z0-9_-]*"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- The writers an option feeds. -->
+  <xs:simpleType name="targetName">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="hyprland-lua"/>   <!-- ~/.config/hypr/settings.lua -->
+      <xs:enumeration value="hypridle"/>       <!-- ~/.config/hypr/idle.conf -->
+      <xs:enumeration value="hyprpaper"/>      <!-- ~/.config/hypr/hyprpaper.conf -->
+      <xs:enumeration value="greeter-sway"/>   <!-- the login screen's sway file -->
+      <xs:enumeration value="riley-dock"/>     <!-- the dock's config and pinned apps -->
+      <xs:enumeration value="riley-desktop"/>  <!-- ~/.config/riley/desktop.json -->
+      <xs:enumeration value="theme"/>          <!-- the current theme (hypr-theme) -->
+      <xs:enumeration value="fonts"/>          <!-- the font overrides (hypr-theme fonts) -->
+      <xs:enumeration value="weather"/>        <!-- the bar's weather settings -->
+      <xs:enumeration value="float-mode"/>     <!-- hypr-float-mode's default -->
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="targets">
+    <xs:restriction>
+      <xs:simpleType><xs:list itemType="targetName"/></xs:simpleType>
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <!-- What runs after a change: a closed list, never a shell line. -->
+  <xs:simpleType name="actionName">
+    <xs:restriction base="xs:token">
+      <xs:enumeration value="hyprland-reload"/>
+      <xs:enumeration value="hypridle-restart"/>
+      <xs:enumeration value="hyprpaper-reload"/>
+      <xs:enumeration value="dock-reload"/>
+      <xs:enumeration value="bar-reload"/>
+      <xs:enumeration value="greeter-sync"/>
+      <xs:enumeration value="none"/>
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:simpleType name="actions">
+    <xs:restriction>
+      <xs:simpleType><xs:list itemType="actionName"/></xs:simpleType>
+      <xs:minLength value="1"/>
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="choice">
+    <xs:attribute name="value" type="xs:string" use="required"/>
+    <xs:attribute name="label" type="xs:string" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="field">
+    <xs:sequence>
+      <xs:element name="choice" type="choice" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="name" type="name" use="required"/>
+    <xs:attribute name="type" type="fieldType" use="required"/>
+    <xs:attribute name="label" type="xs:string" use="required"/>
+    <xs:attribute name="help" type="xs:string"/>
+    <xs:attribute name="default" type="xs:string"/>
+    <xs:attribute name="min" type="xs:decimal"/>
+    <xs:attribute name="max" type="xs:decimal"/>
+    <xs:attribute name="step" type="xs:decimal"/>
+  </xs:complexType>
+
+  <xs:complexType name="option">
+    <xs:sequence>
+      <xs:element name="choice" type="choice" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="field" type="field" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+    <xs:attribute name="key" type="key" use="required"/>
+    <xs:attribute name="label" type="xs:string" use="required"/>
+    <xs:attribute name="help" type="xs:string"/>
+    <xs:attribute name="type" type="optionType" use="required"/>
+    <xs:attribute name="default" type="xs:string"/>
+    <xs:attribute name="min" type="xs:decimal"/>
+    <xs:attribute name="max" type="xs:decimal"/>
+    <xs:attribute name="step" type="xs:decimal"/>
+    <xs:attribute name="target" type="targets" use="required"/>
+    <xs:attribute name="action" type="actions" use="required"/>
+  </xs:complexType>
+
+  <xs:complexType name="section">
+    <xs:sequence>
+      <xs:element name="option" type="option" maxOccurs="unbounded">
+        <xs:unique name="field-name">
+          <xs:selector xpath="field"/>
+          <xs:field xpath="@name"/>
+        </xs:unique>
+      </xs:element>
+    </xs:sequence>
+    <xs:attribute name="title" type="xs:string" use="required"/>
+    <xs:attribute name="help" type="xs:string"/>
+  </xs:complexType>
+
+  <!-- A page holds sections; a page drawn by its own QML component (widget) holds only the options it stores. -->
+  <xs:complexType name="page">
+    <xs:choice minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="section" type="section"/>
+      <xs:element name="option" type="option">
+        <xs:unique name="widget-field-name">
+          <xs:selector xpath="field"/>
+          <xs:field xpath="@name"/>
+        </xs:unique>
+      </xs:element>
+    </xs:choice>
+    <xs:attribute name="id" type="name" use="required"/>
+    <xs:attribute name="title" type="xs:string" use="required"/>
+    <xs:attribute name="order" type="xs:integer" use="required"/>
+    <xs:attribute name="icon" type="xs:string"/>
+    <xs:attribute name="help" type="xs:string"/>
+    <xs:attribute name="widget" type="name"/>
+  </xs:complexType>
+
+  <xs:element name="description">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="page" type="page" maxOccurs="unbounded"/>
+      </xs:sequence>
+      <xs:attribute name="version" type="xs:positiveInteger" use="required"/>
+    </xs:complexType>
+    <xs:unique name="option-key">
+      <xs:selector xpath=".//option"/>
+      <xs:field xpath="@key"/>
+    </xs:unique>
+    <xs:unique name="page-id">
+      <xs:selector xpath="page"/>
+      <xs:field xpath="@id"/>
+    </xs:unique>
+  </xs:element>
+</xs:schema>
