@@ -144,6 +144,7 @@ endif()
 
 if(RILEY_PLANT_FAULT_SWITCH)
     message(WARNING "RILEY_PLANT_FAULT_SWITCH is ON: the M4 gate's planted faults (gate builds only)")
+    # Covers the importer (riley-config-core) and the layout picker's and printer options' faults (panel pages).
     target_compile_definitions(riley-config-core PRIVATE RILEY_PLANT_FAULT_SWITCH)
     target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_SWITCH)
 endif()
