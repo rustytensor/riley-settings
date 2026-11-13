@@ -12,6 +12,7 @@ option(RILEY_PLANT_FAULT_PANEL "Plant the gate's fault in the panel's bindings (
 # The M3 gate's planted faults: one per custom page (docs/pages-contract.md, "The planted faults").
 option(RILEY_PLANT_FAULT_PAGES "Plant the M3 gate's faults in the custom pages (tests only)" OFF)
 # The M4 gate's planted faults (docs/switch-contract.md, "The planted faults").
+option(RILEY_PLANT_FAULT_KEYS "Plant the keys gate's fault: hyprland-keys ignores the values file (tests only)" OFF)
 option(RILEY_PLANT_FAULT_SWITCH "Plant the M4 gate's faults in the import, the layout picker and the printer options (tests only)" OFF)
 
 include(GNUInstallDirs)
@@ -49,10 +50,15 @@ add_library(riley-config-core STATIC
     src/config/writers/riley-desktop.cpp
     src/config/writers/desktop-layout.cpp
     src/config/writers/desktop-layout.h
+    src/config/writers/hyprland-keys.cpp
 )
 target_include_directories(riley-config-core PUBLIC src)
 target_link_libraries(riley-config-core PUBLIC Qt6::Core PRIVATE LibXml2::LibXml2)
 target_compile_definitions(riley-config-core PUBLIC QT_NO_KEYWORDS QT_NO_CAST_FROM_ASCII)
+if(RILEY_PLANT_FAULT_KEYS)
+    message(WARNING "RILEY_PLANT_FAULT_KEYS is ON: hyprland-keys ignores the values file (gate builds only)")
+    target_compile_definitions(riley-config-core PRIVATE RILEY_PLANT_FAULT_KEYS)
+endif()
 if(RILEY_PLANT_FAULT)
     message(WARNING "RILEY_PLANT_FAULT is ON: writers drop the second line of their output (gate builds only)")
     target_compile_definitions(riley-config-core PRIVATE RILEY_PLANT_FAULT)

@@ -52,6 +52,7 @@
   <xs:simpleType name="targetName">
     <xs:restriction base="xs:token">
       <xs:enumeration value="hyprland-lua"/>   <!-- ~/.config/hypr/settings.lua -->
+      <xs:enumeration value="hyprland-keys"/>  <!-- ~/.config/hypr/keys-user.lua, the key bindings you changed -->
       <xs:enumeration value="hypridle"/>       <!-- ~/.config/hypr/idle.conf -->
       <xs:enumeration value="hyprpaper"/>      <!-- ~/.config/hypr/hyprpaper.conf -->
       <xs:enumeration value="greeter-sway"/>   <!-- the login screen's sway file -->

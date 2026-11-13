@@ -40,8 +40,13 @@ public:
     // missing one is not made (hyprpaper with no wallpaper picked in the panel: the theme decides).
     virtual bool leavesFileAlone(const Config& config) const { Q_UNUSED(config); return false; }
 
+    // True when, with these values, the target file must not exist: write() removes it (hyprland-keys with no key
+    // set: a missing keys-user.lua keeps every Riley default).
+    virtual bool removesFile(const Config& config) const { Q_UNUSED(config); return false; }
+
     // Render, then write the text to `outPath` through writeTargetFile (atomic). Not virtual: every writer's output
-    // goes through that one function. Writes nothing (and returns true) when leavesFileAlone().
+    // goes through that one function. Writes nothing (and returns true) when leavesFileAlone(); removes `outPath`
+    // when removesFile().
     bool write(const Config& config, const QString& outPath, const QByteArray* existing, QString* error) const;
 
     // True when the writer finds its own files: more than one, outside $XDG_CONFIG_HOME, or only the part of a file

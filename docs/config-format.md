@@ -96,12 +96,16 @@ then rename). Numbers are written as C's `%g` (`1.0` becomes `1`, `-0.2` stays `
 | `hypridle` | `~/.config/hypr/idle.conf` | whole | `power.screensaver_after`, `power.lock_after`, `power.screens_off_after`, `power.sleep_after` |
 | `hyprpaper` | `~/.config/hypr/hyprpaper.conf` | whole | `wallpaper.picture`, `wallpaper.screens`, `display.monitors` |
 | `greeter-sway` | the login screen's sway file (installed by `riley-greeter-sync`) | whole | `display.monitors`, `input.kb_layout` |
+| `hyprland-keys` | `~/.config/hypr/keys-user.lua` (read by Riley's `hypr/keys.lua`) | whole; removed when no key is set | `keys.agent_stop`, `keys.sleep` |
 
 - `hyprland-lua` writes only the keys your values file sets; everything else falls back to `hyprland.lua`. The
   Displays part is always written. Appearance and Keyboard-and-mouse appear only when one of their keys is set.
   Startup apps appear only when an enabled app has a command. A `text`, `choice` or `font` value is a quoted Lua
   string, except a `choice` whose choice values are all integers, which is a number.
 - The others use your value, or the description's default when it is not set.
+- `hyprland-keys` writes only the keys your values file sets, in the description's order, as a Lua table from option
+  key to binding (`["keys.sleep"] = "SUPER+CTRL+Escape",`); `\` and `"` are escaped, control bytes become `\ddd`. A
+  key left out keeps Riley's default. With no key set the file is removed, which also keeps every default.
 - `hyprpaper`: one block per enabled screen of `display.monitors`, in list order, each with that screen's picture
   from `wallpaper.screens` or else `wallpaper.picture`. With no per-screen picture, one catch-all block.
 

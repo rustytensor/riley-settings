@@ -3,6 +3,8 @@
 #include "atomic_file.h"
 #include "writers/writers.h"
 
+#include <QFile>
+
 #include <vector>
 
 namespace riley::config {
@@ -21,6 +23,7 @@ const std::vector<std::unique_ptr<Writer>>& registry()
         w.push_back(writers::makeRileyModel());
         w.push_back(writers::makeRileyDock());
         w.push_back(writers::makeRileyDesktop());
+        w.push_back(writers::makeHyprlandKeys());
         return w;
     }();
     return writers;
@@ -35,6 +38,7 @@ constexpr TargetFile kTargetFiles[] = {
     {"hypridle", "hypr/idle.conf"},
     {"hyprpaper", "hypr/hyprpaper.conf"},
     {"hyprland-lua", "hypr/settings.lua"},
+    {"hyprland-keys", "hypr/keys-user.lua"},   // read by Riley's hypr/keys.lua (riley bf5b0fb)
     // Riley's model: the GTK panel's own file, which riley-greeter-sync.path watches for the login screen.
     {"riley-model", "hypr/settings.json"},
     {"greeter-sway", "riley/greeter-sway.conf"},   // riley-config and the M1 gate only; no option names it
@@ -55,6 +59,14 @@ bool Writer::write(const Config& config, const QString& outPath, const QByteArra
 {
     if (leavesFileAlone(config))
         return true;
+    if (removesFile(config)) {
+        QFile file(outPath);
+        if (file.exists() && !file.remove()) {
+            *error = outPath + QStringLiteral(": ") + file.errorString();
+            return false;
+        }
+        return true;
+    }
     QByteArray text;
     if (!render(config, existing, &text, error))
         return false;

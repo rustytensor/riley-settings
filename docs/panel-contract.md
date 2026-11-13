@@ -35,6 +35,7 @@ The gate builds `tests/panel/CMakeLists.txt`, which adds the repo as a subdirect
 | The description | `$RILEY_SETTINGS_SHARE/settings.xml`, schemas in `$RILEY_SETTINGS_SHARE/schema/` (default: the installed share directory) |
 | Your values | `$XDG_CONFIG_HOME/riley/settings.xml` (default `$HOME/.config/riley/settings.xml`) |
 | Target `hypridle` | `$XDG_CONFIG_HOME/hypr/idle.conf` |
+| Target `hyprland-keys` | `$XDG_CONFIG_HOME/hypr/keys-user.lua` (removed when no key is set) |
 | Target `hyprpaper` | `$XDG_CONFIG_HOME/hypr/hyprpaper.conf` |
 | Target `hyprland-lua` | `$XDG_CONFIG_HOME/hypr/settings.lua` |
 | Target `greeter-sway` | a file under `$XDG_CONFIG_HOME/riley/` (the build chooses its name; `greeter-sync` installs it) |
