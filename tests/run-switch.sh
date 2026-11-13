@@ -7,7 +7,7 @@
 #   tests/run-switch.sh --plant-fault   build with -DRILEY_PLANT_FAULT_SWITCH=ON into .../switch-fault (the importer drops
 #                                       its last key, the layout picker puts the second layout's variant on the first,
 #                                       the printer options leave out the last one) and check Riley's launcher from a
-#                                       copy that ignores --gtk (one sed line); every group with a fault must then have
+#                                       copy that starts the Qt panel without --apply-actions (one sed line); every group with a fault must then have
 #                                       a failing check; it exits 0 only when each does
 #   BUILD_DIR=/some/dir tests/run-switch.sh   another build directory
 #   RILEY_REPO=/path/to/riley tests/run-switch.sh   where Riley's launcher is read (default /home/marcm/git/riley)
@@ -64,10 +64,10 @@ REAL_CFG=${XDG_CONFIG_HOME:-$HOME/.config}
 REAL_HYPR=$HOME/.config/hypr          # where Riley's GTK panel keeps its model (core.py: Path.home() / ".config/hypr")
 REAL_FILES="$REAL_HYPR/settings.json $REAL_HYPR/settings.lua $REAL_HYPR/keys-user.lua $REAL_HYPR/idle.conf $REAL_HYPR/hypridle.conf
     $REAL_HYPR/hyprpaper.conf $REAL_HYPR/float-mode.json $REAL_HYPR/current-theme $REAL_HYPR/current-background
-    $REAL_HYPR/wallpapers.json $HOME/.config/riley/desktop.json $REAL_CFG/riley/settings.xml $REAL_CFG/riley/settings-panel
+    $REAL_HYPR/wallpapers.json $HOME/.config/riley/desktop.json $REAL_CFG/riley/settings.xml
     $REAL_CFG/riley/fonts.toml $REAL_CFG/riley/weather.toml $REAL_CFG/riley/greeter-sway.conf
     $REAL_CFG/nwg-dock-hyprland/riley.conf $REAL_CFG/riley-dock/config.xml $HOME/.cache/nwg-dock-pinned
-    $HOME/.cups/lpoptions $HOME/.local/bin/riley-settings $HOME/.local/bin/riley-settings-use $HOME/.local/bin/riley-settings-qt"
+    $HOME/.cups/lpoptions $HOME/.local/bin/riley-settings $HOME/.local/bin/riley-settings-qt"
 state() { for f in $REAL_FILES; do if [ -e "$f" ] || [ -L "$f" ]; then stat -c '%n %y %s' "$f"; else echo "$f absent"; fi; done; }
 REAL_BEFORE=$(state)
 REPO_BEFORE=$(git -C "$REPO" status --porcelain 2>/dev/null)
@@ -189,7 +189,7 @@ for c in hyprctl Hyprland hypr-settings system-config-printer gnome-control-cent
          hypr-theme hypr-theme.py hyprpaper hypridle hyprlock hypr-idle hypr-desktop-menu hypr-reload hypr-float-mode \
          riley-dock riley-dock-qt nwg-dock-hyprland riley-greeter-sync riley-desktop pkill killall sudo pkexec lpadmin \
          cupsenable cupsaccept ippfind ipptool lp lpstat lpoptions cancel notify-send quickshell qs waybar kitty \
-         google-chrome xdg-open gio swaymsg sway python3 riley-settings riley-settings-gtk; do
+         google-chrome xdg-open gio swaymsg sway python3 riley-settings; do
     printf '#!/bin/sh\necho "%s $*" >>"%s"\nexit 1\n' "$c" "$RUN/trap.log" >"$RUN/trap/$c"
     chmod +x "$RUN/trap/$c"
 done
@@ -454,39 +454,32 @@ else
     fail "install: not built"
 fi
 
-# ---- launcher: Riley's bin/riley-settings, from a copy, with a fake riley-settings-qt and a fake GTK entry ----------
+# ---- launcher: Riley's bin/riley-settings, from a copy, with a fake riley-settings-qt -----------------------------
+# Riley's GTK panel is gone (riley 7f0c901): the launcher only starts the Qt panel.
 L=$RUN/launcher
 SRC=$RILEY_REPO/bin/riley-settings
-USE=$RILEY_REPO/bin/riley-settings-use
-GTKREAL=$RILEY_REPO/bin/riley-settings-gtk
-GTK_LINE='^[[:space:]]*--gtk\) panel=gtk ;;$'
+QT_LINE='^exec riley-settings-qt --apply-actions "\$@"$'
 ready=1
-if [ -x "$GTKREAL" ] && grep -q 'from riley_settings.app import main' "$GTKREAL"; then
-    pass "launcher: Riley's bin/riley-settings-gtk is the GTK panel's entry (riley_settings.app main)"
-else fail "launcher: Riley's bin/riley-settings-gtk is the GTK panel's entry (riley_settings.app main)" "$GTKREAL"; fi
-if [ -f "$SRC" ] && [ "$(head -n 1 "$SRC")" = '#!/bin/sh' ] && ! grep -q 'riley_settings' "$SRC"; then
-    pass "launcher: Riley's bin/riley-settings is a POSIX sh launcher, not the GTK app"
-else fail "launcher: Riley's bin/riley-settings is a POSIX sh launcher, not the GTK app" "$(first_line "$SRC")"; ready=0; fi
-if [ -f "$USE" ] && [ "$(head -n 1 "$USE")" = '#!/bin/sh' ]; then pass "launcher: Riley's bin/riley-settings-use is a POSIX sh script"
-else fail "launcher: Riley's bin/riley-settings-use is a POSIX sh script" "$USE"; ready=0; fi
-n_gtk=$(grep -cE "$GTK_LINE" "$SRC" 2>/dev/null)
-if [ "${n_gtk:-0}" = 1 ]; then pass "launcher: it has exactly one line \"--gtk) panel=gtk ;;\" (where the planted copy cuts)"
-else fail "launcher: it has exactly one line \"--gtk) panel=gtk ;;\" (where the planted copy cuts)" "${n_gtk:-0} lines"; ready=0; fi
+if [ -f "$SRC" ] && [ "$(head -n 1 "$SRC")" = '#!/bin/sh' ] && ! grep -qiE 'gtk|import' "$SRC"; then
+    pass "launcher: Riley's bin/riley-settings is a POSIX sh launcher that names no GTK panel"
+else fail "launcher: Riley's bin/riley-settings is a POSIX sh launcher that names no GTK panel" "$(first_line "$SRC")"; ready=0; fi
+others=$(cd "$RILEY_REPO" && ls -d bin/riley-settings?* settings/*/app.py 2>/dev/null | tr '\n' ' ')
+if [ -z "$others" ]; then pass "launcher: Riley's bin/ has no other riley-settings* program, and Riley has no GTK app entry"
+else fail "launcher: Riley's bin/ has no other riley-settings* program, and Riley has no GTK app entry" "still there: $others"; fi
+n_qt=$(grep -cE "$QT_LINE" "$SRC" 2>/dev/null)
+if [ "${n_qt:-0}" = 1 ]; then pass "launcher: it has exactly one line \"exec riley-settings-qt --apply-actions \"\$@\"\" (where the planted copy cuts)"
+else fail "launcher: it has exactly one line \"exec riley-settings-qt --apply-actions \"\$@\"\" (where the planted copy cuts)" "${n_qt:-0} lines"; ready=0; fi
 if [ "$ready" = 1 ]; then
     rm -rf -- "$L"; mkdir -p "$L/riley/bin" "$L/localbin" "$L/qtbin" "$L/home"
-    if [ "$FAULT" = ON ]; then   # the planted copy: --gtk is read and ignored
-        sed -E 's/^([[:space:]]*)--gtk\) panel=gtk ;;$/\1--gtk) ;;/' "$SRC" >"$L/riley/bin/riley-settings"
+    if [ "$FAULT" = ON ]; then   # the planted copy: the Qt panel is started without --apply-actions
+        sed -E 's/^exec riley-settings-qt --apply-actions /exec riley-settings-qt /' "$SRC" >"$L/riley/bin/riley-settings"
         if cmp -s "$SRC" "$L/riley/bin/riley-settings"; then echo "     note: the planted sed line changed nothing"; fi
     else cp "$SRC" "$L/riley/bin/riley-settings"; fi
-    cp "$USE" "$L/riley/bin/riley-settings-use"
-    printf '#!/bin/sh\n{ printf gtk; for a in "$@"; do printf " %%s" "$a"; done; printf "\\n"; } >>"$LAUNCH_LOG"\nexit 0\n' >"$L/riley/bin/riley-settings-gtk"
     printf '#!/bin/sh\n{ printf qt; for a in "$@"; do printf " %%s" "$a"; done; printf "\\n"; } >>"$LAUNCH_LOG"\nexit "${FAKE_QT_EXIT:-0}"\n' >"$L/qtbin/riley-settings-qt"
     chmod +x "$L"/riley/bin/* "$L/qtbin/riley-settings-qt"
     ln -s ../riley/bin/riley-settings "$L/localbin/riley-settings"         # as ~/.local/bin/riley-settings is
-    ln -s ../riley/bin/riley-settings-use "$L/localbin/riley-settings-use"
     WITHQT="$L/qtbin:$L/localbin:$RUN/trap:/usr/bin:/bin"
     NOQT="$L/localbin:$RUN/trap:/usr/bin:/bin"
-    PANEL_FILE=$L/home/.config/riley/settings-panel
     lrun() {   # lrun PATH QT_EXIT PROGRAM ARGS...: run, then $L/got holds what was started, $L/code the exit code
         local path=$1 qexit=$2 prog=$3; shift 3
         : >"$L/calls.log"
@@ -500,26 +493,15 @@ if [ "$ready" = 1 ]; then
         if [ "$got" = "$2" ] && [ "$code" = "$3" ]; then pass "launcher: $1"
         else fail "launcher: $1" "started: [$(tr '\n' ';' <<<"$got")], exit $code; want [$(tr '\n' ';' <<<"$2")], exit $3"; fi
     }
-    rm -rf -- "$L/home/.config"
-    lrun "$WITHQT" 0 riley-settings;          expect "no settings-panel file: riley-settings-qt --apply-actions" "qt --apply-actions" 0
-    lrun "$WITHQT" 0 riley-settings --gtk;    expect "--gtk: the GTK panel for this run" "gtk" 0
-    lrun "$NOQT" 0 riley-settings;            expect "riley-settings-qt not installed: the GTK panel" "gtk" 0
-    lrun "$WITHQT" 127 riley-settings;        expect "riley-settings-qt fails to start (127): the GTK panel" "$(printf 'qt --apply-actions\ngtk')" 0
-    lrun "$WITHQT" 3 riley-settings;          expect "riley-settings-qt exits 3: no GTK panel, the launcher exits 3" "qt --apply-actions" 3
-    lrun "$WITHQT" 0 riley-settings-use gtk;  expect "riley-settings-use gtk starts nothing and exits 0" "" 0
-    if [ "$(cat "$PANEL_FILE" 2>/dev/null; printf x)" = "$(printf 'gtk\nx')" ]; then pass "launcher: riley-settings-use gtk writes \"gtk\" into ~/.config/riley/settings-panel"
-    else fail "launcher: riley-settings-use gtk writes \"gtk\" into ~/.config/riley/settings-panel" "$(cat "$PANEL_FILE" 2>&1 | head -n 2)"; fi
-    lrun "$WITHQT" 0 riley-settings;          expect "settings-panel \"gtk\": the GTK panel" "gtk" 0
-    lrun "$WITHQT" 0 riley-settings-use qt;   expect "riley-settings-use qt starts nothing and exits 0" "" 0
-    if [ "$(cat "$PANEL_FILE" 2>/dev/null; printf x)" = "$(printf 'qt\nx')" ]; then pass "launcher: riley-settings-use qt writes \"qt\""
-    else fail "launcher: riley-settings-use qt writes \"qt\"" "$(cat "$PANEL_FILE" 2>&1 | head -n 2)"; fi
-    lrun "$WITHQT" 0 riley-settings;          expect "settings-panel \"qt\": riley-settings-qt --apply-actions" "qt --apply-actions" 0
-    lrun "$WITHQT" 0 riley-settings --gtk;    expect "settings-panel \"qt\" and --gtk: the GTK panel" "gtk" 0
-    lrun "$WITHQT" 0 riley-settings-use maybe; expect "riley-settings-use maybe: refused (exit 2), nothing started" "" 2
-    if [ "$(cat "$PANEL_FILE" 2>/dev/null; printf x)" = "$(printf 'qt\nx')" ]; then pass "launcher: a refused riley-settings-use leaves the file as it was"
-    else fail "launcher: a refused riley-settings-use leaves the file as it was" "$(cat "$PANEL_FILE" 2>&1 | head -n 2)"; fi
+    lrun "$WITHQT" 0 riley-settings;              expect "riley-settings-qt --apply-actions" "qt --apply-actions" 0
+    lrun "$WITHQT" 0 riley-settings --check;      expect "arguments pass through: riley-settings-qt --apply-actions --check" "qt --apply-actions --check" 0
+    lrun "$WITHQT" 3 riley-settings;              expect "riley-settings-qt exits 3: the launcher exits 3" "qt --apply-actions" 3
+    lrun "$NOQT" 0 riley-settings;                expect "riley-settings-qt not installed: nothing started, exit 127" "" 127
+    if [ "$(grep -c '' "$L/err")" = 1 ] && grep -q 'riley-settings-qt is not installed' "$L/err"; then
+        pass "launcher: not installed: one line on stderr says so"
+    else fail "launcher: not installed: one line on stderr says so" "$(head -n 2 "$L/err")"; fi
 else
-    fail "launcher: the launcher cases ran" "Riley's launcher is not the M4 launcher yet ($SRC), so it was not run"
+    fail "launcher: the launcher cases ran" "Riley's launcher is not the Qt-only launcher ($SRC), so it was not run"
 fi
 
 # ---- pages, layout, printers: the harness ---------------------------------------------------------------------------

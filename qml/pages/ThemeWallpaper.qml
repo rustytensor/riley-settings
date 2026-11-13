@@ -1,7 +1,7 @@
 // Wallpapers per screen: drop a picture on a screen, or use one everywhere (docs/pages-contract.md, "Wallpapers").
 // The root's objectName is widget:theme-wallpaper. The functions below are the ones the gate calls (untyped parameters);
 // the page's own mouse, drag and drop handlers call the same ones.
-// A port of the wallpaper part of Riley's settings/riley_settings/theme_wallpaper.py: your screens as they are
+// A port of the wallpaper part of Riley's GTK panel's theme_wallpaper.py (riley 2364a47): your screens as they are
 // arranged, each showing its picture; drag a picture onto one screen (from below or from a file manager), or click a
 // picture to use it on every screen. The theme cards are not part of M3.
 import QtQuick

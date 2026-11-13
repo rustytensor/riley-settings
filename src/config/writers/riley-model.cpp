@@ -1,7 +1,7 @@
 // Writer for the target "riley-model": ~/.config/hypr/settings.json, the whole file, in the format of Riley's GTK
 // panel (settings/riley_settings/core.py: _write_atomic(json.dumps(model_for_save(model), indent=2) + "\n")).
 // riley-greeter-sync.path watches this file and renders the login screen's sway config from it as root
-// (Riley's sddm/install-sddm.sh), and the GTK panel, kept as the way back, reads it (docs/switch-contract.md).
+// (Riley's sddm/install-sddm.sh; docs/switch-contract.md).
 //
 // The keys, in order: "version" 1, "monitors" (always), then "appearance" and "input" when one of their keys is set
 // (each written whole, unset keys at their defaults), "startup" when it has items, "power" when one of its keys is set.

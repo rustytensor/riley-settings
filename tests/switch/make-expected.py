@@ -57,7 +57,8 @@ INPUT_DEFAULTS = {"kb_layout": "us", "kb_variant": "", "kb_options": "", "repeat
                   "sensitivity": 0, "accel_profile": "", "natural_scroll": False, "follow_mouse": 1}
 
 # ---- import cases: the riley-model writer's output from the hand-worked values files -----------------------------
-idle = core.parse_idle((riley / "settings/tests/expected-m7-idle.conf").read_text())
+# Riley's expected-m7-idle.conf, byte for byte the copy this repo pins in tests/expected/ (Riley deleted its own in 7f0c901).
+idle = core.parse_idle((Path(__file__).resolve().parents[2] / "tests/expected/expected-m7-idle.conf").read_text())
 m1 = {"version": 1, "monitors": MON,
       "power": {"screensaver": 0, "lock": 600, "screens_off": 900, "sleep": 3600}}
 assert {k: m1["power"][k] for k in ("lock", "screens_off", "sleep")} == idle and "screensaver" not in idle

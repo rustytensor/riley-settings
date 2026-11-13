@@ -1,5 +1,5 @@
 // Dock: pins by drag and drop, the app list, the dock's screens (docs/pages-contract.md, "Dock").
-// A port of Riley's settings/riley_settings/dock.py and the parts of dock_core.py it uses (insert_index, move_pin,
+// A port of Riley's GTK panel's dock.py (riley 2364a47) and the parts of dock_core.py it uses (insert_index, move_pin,
 // remove_pin, all_apps, connected_screens). The pins and the screens are the page's options with role "pins" and
 // "screens"; the dock's other options are M2 controls (PageOptions.qml). Every change is one Controller::commitStep.
 #pragma once

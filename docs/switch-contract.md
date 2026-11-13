@@ -24,7 +24,7 @@ The gate checks these points against results worked out by hand from Riley's cod
 | Desktop boxes | `~/.config/riley/desktop.json` | `desktop_page.py`, `desktop/riley_desktop/layout.py` |
 
 So the greeter writer of this panel writes `~/.config/hypr/settings.json` in Riley's model format (the target
-`riley-model`, below). No system unit changes; the GTK panel, kept as the way back, keeps reading a current model.
+`riley-model`, below). No system unit changes.
 
 ## What the build provides
 
@@ -180,25 +180,15 @@ and runs no command.
 
 ## The launcher (Riley's `bin/riley-settings`)
 
-The keybinding stays as it is: Super+Ctrl+S runs `riley-settings`, which is `~/.local/bin/riley-settings ->
-~/git/riley/bin/riley-settings`. That file becomes a small launcher; the GTK panel's Python entry moves, unchanged, to
-**`bin/riley-settings-gtk`** (today's `bin/riley-settings`: `from riley_settings.app import main`).
+Super+Ctrl+S runs `riley-settings`, which is `~/.local/bin/riley-settings -> ~/git/riley/bin/riley-settings`. Riley's
+GTK panel was deleted on 2026-11-13 (riley 7f0c901), so the launcher starts only the Qt panel.
 
-- `bin/riley-settings` is a POSIX `sh` script (first line exactly `#!/bin/sh`) that does not name `riley_settings`.
-- It finds `riley-settings-gtk` next to itself after resolving its own symlinks (`readlink -f "$0"`), never on PATH.
-- The panel chosen: `gtk` when an argument is `--gtk` (removed from the arguments; one run only); else the first word
-  of `${XDG_CONFIG_HOME:-$HOME/.config}/riley/settings-panel` when that is `gtk`; else `qt` (missing file, `qt`,
-  anything else).
-- `qt`: when `riley-settings-qt` is on PATH, it runs `riley-settings-qt --apply-actions "$@"` as a child; when that
-  exits 127 (it could not start), it runs the GTK panel; otherwise it exits with its code. When `riley-settings-qt` is
-  not on PATH: the GTK panel.
-- `gtk`: runs `riley-settings-gtk "$@"`, and exits with its code.
-- Its argument loop holds exactly one line matching `^[[:space:]]*--gtk\) panel=gtk ;;$` (the gate's planted copy
-  replaces it with `--gtk) ;;`).
-- **`bin/riley-settings-use gtk|qt`** (POSIX `sh`, first line `#!/bin/sh`) writes that word and a newline into
-  `${XDG_CONFIG_HOME:-$HOME/.config}/riley/settings-panel` (making the folder, by a temporary file and a rename),
-  starts nothing, exits 0. Any other argument, or none: exit 2, a usage line on stderr, the file unchanged.
-- Ways back: `riley-settings --gtk` for one run; `riley-settings-use gtk` for good; `riley-settings-use qt` to return.
+- `bin/riley-settings` is a POSIX `sh` script (first line exactly `#!/bin/sh`) that names no GTK panel and imports
+  nothing.
+- When `riley-settings-qt` is on PATH it runs, as its last line, exactly `exec riley-settings-qt --apply-actions "$@"`
+  (the gate's planted copy drops `--apply-actions`), so the launcher's exit code is the panel's.
+- When `riley-settings-qt` is not on PATH it starts nothing, prints one line on stderr saying so, and exits 127.
+- Riley's `bin/` has no other `riley-settings*` program.
 
 ## Keyboard layout picker (`widget:keyboard-mouse`)
 
@@ -270,7 +260,7 @@ With `-DRILEY_PLANT_FAULT_SWITCH=ON` (one build plants all of them; the launcher
 | import | the importer leaves out the last key it would write (description order) | import-fixture (m1 `power.sleep_after`, m3 `desktop.icon_size`, m4 `startup.apps`), import-real (Marc's last key) |
 | layout picker | `kb_variant`'s first part is the second layout's variant (`std,std` for `us`/`ro std`) | layout steps 1 and 4 |
 | printer options | `optionNames` leaves out the last option offered | printers (Office's quality, RileyGate's two-sided) |
-| launcher | the gate's copy of `bin/riley-settings`, made with one `sed` line: `--gtk` is read and ignored | launcher (`--gtk` cases) |
+| launcher | the gate's copy of `bin/riley-settings`, made with one `sed` line: the Qt panel starts without `--apply-actions` | launcher (the cases that start the panel) |
 
 The gate is proven when the groups import-fixture, import-real, launcher, layout and printers each have at least one
 failing check in the fault run.
@@ -278,7 +268,7 @@ failing check in the fault run.
 ## The gate's sequence
 
 Throwaway homes under `$BUILD_DIR/run`; `env -i`; traps first on PATH for the desktop's commands (and `python3`,
-`riley-settings`, `riley-settings-gtk`); fakes before them for the harness. Groups:
+`riley-settings`); fakes before them for the harness. Groups:
 
 | Group | What |
 |---|---|
@@ -289,11 +279,11 @@ Throwaway homes under `$BUILD_DIR/run`; `env -i`; traps first on PATH for the de
 | import-real | Marc's live files of the table above, copied read only into a home (and `~/Desktop`'s folder names); `--import` exit 0; the values valid with no unknown key; `--check --out`: exit 0, every line `same` (`expected/check-real.txt`), nothing written; every file in `--out` = Marc's live file byte for byte, and no file where Marc has none |
 | start | offscreen, Basic and Fusion, the M3 fakes first on PATH for the pages' queries, empty home: runs until stopped, no QML warning, nothing written; first start in the m1 home without values: values = `expected/import-m1.values.xml`, nothing else written, no warning |
 | install | `cmake --install --prefix`: exactly the 5 files; the installed binary with `RILEY_SETTINGS_SHARE` unset, `--check` in a home with `import-m1.values.xml`: exit 1, `expected/check-install.txt`, nothing written; a copy of the prefix without `share/`: exit 2 |
-| launcher | Riley's `bin/riley-settings-gtk` is the GTK entry; `bin/riley-settings` is the sh launcher with the one `--gtk` line; from a copy (called through a symlink, as `~/.local/bin` does) with a fake `riley-settings-qt` and a fake `riley-settings-gtk` that record their argv: no file → `qt --apply-actions`; `--gtk` → `gtk`; qt not on PATH → `gtk`; qt exits 127 → `qt --apply-actions` then `gtk`; qt exits 3 → exit 3, no gtk; `riley-settings-use gtk` → `gtk\n` in the file, then → `gtk`; `riley-settings-use qt` → `qt\n`, then → qt; `--gtk` beats the file; `riley-settings-use maybe` → exit 2, file unchanged |
+| launcher | Riley's `bin/riley-settings` is the sh launcher with the one `exec riley-settings-qt --apply-actions "$@"` line and names no GTK panel; `bin/` has no other `riley-settings*` program; from a copy (called through a symlink, as `~/.local/bin` does) with a fake `riley-settings-qt` that records its argv: no argument → `qt --apply-actions`, exit 0; `--check` → `qt --apply-actions --check`; qt exits 3 → exit 3; qt not on PATH → nothing started, exit 127, one stderr line |
 | pages | harness: every page shown once from an empty home: no QML warning, nothing recorded or written |
 | layout | harness, seed `seeds/layout-values.xml` (fixture-m1's screens, `kb_layout` `de`, `kb_options` `caps:escape,grp:caps_toggle`): `layoutCodes`, `switchKeys`, `variantsFor("ro")`, `variantsFor("de")` against the gate's own reading of evdev.lst; step 1 `("us", "", "ro", "std", "grp:alt_shift_toggle")`: values `layout-values-1.xml`, `settings.lua` `layout-settings-1.lua`, `settings.json` `layout-model-1.json`, log 2 lines; step 2 `("us", "", "", "", "grp:alt_shift_toggle")`: `-2` files, log 4; step 3 `("us", "", "", "", "grp:caps_toggle")`: nothing; step 4 `("de", "nodeadkeys", "fr", "", "grp:ctrl_shift_toggle")`: `layout-values-3.xml`, log 6; 3 refusals; the home holds the values file, `settings.lua`, `settings.json` |
 | printers | harness, the M3 fake queues plus a fake `ipptool` (`fixtures/ipptool-*.txt`) and your Office colour set to `auto` (not a choice): `optionNames` Office `[media, print-color-mode, print-quality]`, RileyGate `[media, print-color-mode, sides]`; each option's choices, labels and value; 6 `printer-option:` items; 3 changes read back; their argv = `expected/printers-option-calls.log` |
-| untouched | no trap called; no unexpected fake call; the repo's working tree as before; Marc's files (model, targets, values, `settings-panel`, pins, lpoptions, `~/.local/bin` launchers) unchanged (mtime, size) |
+| untouched | no trap called; no unexpected fake call; the repo's working tree as before; Marc's files (model, targets, values, pins, lpoptions, `~/.local/bin` launchers) unchanged (mtime, size) |
 
 The fixture homes: Riley's `fixture-mN.json` as `~/.config/hypr/settings.json`, Riley's `expected-mN.lua` as
 `settings.lua`, then `tests/switch/fixtures/mN-home/` (m1: also Riley's `expected-m7-idle.conf` as `idle.conf`).
@@ -323,5 +313,5 @@ The fixture homes: Riley's `fixture-mN.json` as `~/.config/hypr/settings.json`, 
 ## What is not checked here (left for Marc)
 
 The switch on the live desktop: Super+Ctrl+S opening the Qt panel, `--apply-actions` reloading for real, the greeter
-following `settings.json` (`riley-greeter-sync.path`, needs the live system), the real `ipptool` answer of Marc's own
-queues, and using the GTK panel through `riley-settings --gtk` afterwards.
+following `settings.json` (`riley-greeter-sync.path`, needs the live system), and the real `ipptool` answer of Marc's own
+queues.

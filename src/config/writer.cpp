@@ -39,7 +39,7 @@ constexpr TargetFile kTargetFiles[] = {
     {"hyprpaper", "hypr/hyprpaper.conf"},
     {"hyprland-lua", "hypr/settings.lua"},
     {"hyprland-keys", "hypr/keys-user.lua"},   // read by Riley's hypr/keys.lua (riley bf5b0fb)
-    // Riley's model: the GTK panel's own file, which riley-greeter-sync.path watches for the login screen.
+    // Riley's model (the old GTK panel's file), which riley-greeter-sync.path watches for the login screen.
     {"riley-model", "hypr/settings.json"},
     {"greeter-sway", "riley/greeter-sway.conf"},   // riley-config and the M1 gate only; no option names it
 };

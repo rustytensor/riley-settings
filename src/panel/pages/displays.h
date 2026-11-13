@@ -1,5 +1,5 @@
 // Displays: drag screens into place, apply with a 15 s revert (docs/pages-contract.md, "Displays").
-// A port of Riley's settings/riley_settings/displays.py (Arrangement.on_update, on_end; DisplaysPage.apply, on_keep)
+// A port of Riley's GTK panel's displays.py (riley 2364a47) (Arrangement.on_update, on_end; DisplaysPage.apply, on_keep)
 // and core.py (logical_size, apply, restore). The screens are the page's option with role="screens" (a list); the
 // page never names its key.
 #pragma once

@@ -2,7 +2,7 @@
 <!-- Riley Settings: every page, section and option of the panel. Checked against schema/settings.xsd on every load.
      A new, renamed, moved or removed setting is an edit to this file, not to the panel's code.
      Pages with widget="..." are drawn by their own QML component; they hold only the options they store.
-     Taken from Riley's GTK panel (settings/riley_settings/*.py): its pages, in its sidebar order. -->
+     Taken from Riley's GTK panel (its pages in riley 2364a47): its pages, in its sidebar order. -->
 <description version="1">
 
   <page id="displays" title="Displays" order="10" icon="video-display-symbolic" widget="displays"

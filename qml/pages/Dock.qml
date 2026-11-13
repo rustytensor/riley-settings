@@ -1,7 +1,7 @@
 // Dock: pins by drag and drop, the app list, the dock's screens (docs/pages-contract.md, "Dock").
 // The root's objectName is widget:dock. The functions below are the ones the gate calls (untyped parameters);
 // the page's own mouse, drag and drop handlers call the same ones.
-// A port of Riley's settings/riley_settings/dock.py: drag an icon along the dock to move it, drag an app onto the
+// A port of Riley's GTK panel's dock.py (riley 2364a47): drag an icon along the dock to move it, drag an app onto the
 // dock to add it (or double-click it), drag a dock icon onto Remove to take it off. The dock's other options are
 // M2 controls (PageOptions).
 import QtQuick

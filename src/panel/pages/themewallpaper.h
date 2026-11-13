@@ -1,5 +1,5 @@
 // Wallpapers per screen: drop a picture on a screen, or use one everywhere (docs/pages-contract.md, "Wallpapers").
-// A port of the wallpaper part of Riley's settings/riley_settings/theme_wallpaper.py (ScreenDrop) and core.py's
+// A port of the wallpaper part of Riley's GTK panel's theme_wallpaper.py (riley 2364a47) (ScreenDrop) and core.py's
 // layout_rects and screen_at. The pictures are the page's options with role "picture" (every screen) and
 // "screen-pictures" (one screen's own); the hyprpaper writer turns them into hyprpaper.conf.
 #pragma once
