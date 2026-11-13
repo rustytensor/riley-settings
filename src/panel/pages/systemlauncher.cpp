@@ -2,13 +2,25 @@
 
 namespace riley::panel::pages {
 
+namespace {
+
+// The system's own settings (Riley's app.py). The M3 gate's planted fault: another program.
+QString program()
+{
+#ifdef RILEY_PLANT_FAULT_PAGES
+    return QStringLiteral("gnome-control-center");
+#else
+    return QStringLiteral("hypr-settings");
+#endif
+}
+
+}  // namespace
+
 bool SystemLauncher::launch()
 {
     if (!panel())
         return false;
-    // The M3 gate's planted fault: the entry launches another program.
-    panel()->launch(Controller::plantFaultPages() ? QStringLiteral("gnome-control-center")
-                                                  : QStringLiteral("hypr-settings"));
+    panel()->launch(program());
     return true;
 }
 

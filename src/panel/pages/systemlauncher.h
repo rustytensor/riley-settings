@@ -1,5 +1,6 @@
 // The system launcher: the menu entry of the system-launcher page launches hypr-settings and leaves the page shown as
-// it was (docs/pages-contract.md, "The system launcher"; Riley's app.py).
+// it was (docs/pages-contract.md, "The system launcher"; Riley's app.py). The launch is recorded in the action log as
+// `launch hypr-settings` and run only with --apply-actions.
 #pragma once
 
 #include "common.h"
