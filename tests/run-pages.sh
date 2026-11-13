@@ -44,7 +44,7 @@ first_line() { head -n 1 "$1" 2>/dev/null | cut -c1-200; }
 REAL_CFG=${XDG_CONFIG_HOME:-$HOME/.config}
 REAL_CACHE=${XDG_CACHE_HOME:-$HOME/.cache}
 REAL_FILES="$REAL_CFG/riley/settings.xml $REAL_CFG/riley/desktop.json $REAL_CFG/riley/greeter-sway.conf
-    $REAL_CFG/hypr/idle.conf $REAL_CFG/hypr/hyprpaper.conf $REAL_CFG/hypr/settings.lua
+    $REAL_CFG/hypr/settings.json $REAL_CFG/hypr/idle.conf $REAL_CFG/hypr/hyprpaper.conf $REAL_CFG/hypr/settings.lua
     $REAL_CFG/nwg-dock-hyprland/riley.conf $REAL_CFG/riley-dock/config.xml $REAL_CACHE/nwg-dock-pinned
     $HOME/.cups/lpoptions"
 state() { for f in $REAL_FILES; do if [ -e "$f" ]; then stat -c '%n %y %s' "$f"; else echo "$f absent"; fi; done; }
@@ -86,6 +86,7 @@ declare -A SUM=(
     [expected/desktop-values-4.xml]=f557f573f2a4f6bfe6209a956842f464e8c8936d11965cbf5b829b68f0f210cc
     [expected/desktop-values-5.xml]=47f4a93b203b35cde9dae8db060b92a7a2f46753e44ca952e4308fb718369ea5
     [expected/desktop-values-6.xml]=4c19fce8a1d73f8c3b6fb49fc1cb94bc565bc7a477a3734a48b672ccbdf085c0
+    [expected/displays-model.json]=b027b5f4d700544462a3a600c51f03b255d78734c4e7f23e98ec577735ee696f
     [expected/displays-actions.log]=676765fbd892919e03588e26eaa8c81fd12d575732f75586aec96b1d88f7f93e
     [expected/displays-hyprpaper.conf]=5a57401247ed80ceae36483f53392e4b6b141123b78b0b191ed0cc7a5fa10eb5
     [expected/displays-values-applied.xml]=828570d2f1070443c438e3ed2950646a22c4ae5609af81ef160207fdadacc905
@@ -107,11 +108,10 @@ declare -A SUM=(
     [expected/dock-values-4.xml]=cfe7b51589749700d2e595085f673d34091d74b940bdeee65e21d6e4eba7a089
     [expected/dock-values-5.xml]=e55156018bd46ada1e20c747ade9a98faba2e249c6891577271a8bdeaae8e6ba
     [expected/dock-values-6.xml]=1c341a97f6567e3d212d86938401558bf03fb1e95da9140f00014f287616b31e
-    [expected/expected-greeter.conf]=045efb5349b18a16f3c8b18dbf2b200703036a537d0fee3d3ffeddd68e973f34
     [expected/expected-m1.lua]=65cfdae2f2e597af30299fca905b66a86dbad0cbb6ee0fdbf5057723cc3906da
     [expected/expected-m3.lua]=809f90340d13a2f6c6e548412ce2e2cc38812421f16cb3efa1b488802e61520c
     [expected/keyboard-actions.log]=0791dcd4f3a596d852e3f21f564219b971d11c7ccce2a2acd7b4f14cf2cf2145
-    [expected/keyboard-greeter.conf]=bd903e6d5ee91d605fd5caf3a781412222fdeca12334db94686c504125833be5
+    [expected/keyboard-model.json]=25799e3dd92a4c8b1d862380bde844c8ff653c811415e1145dd5ef09ea4c3051
     [expected/keyboard-values.xml]=568fab2899bf7683342c37d0960711578391080f7ed9c5127e0034950a849954
     [expected/printers-actions.log]=c034dd1b7a8f991e22cc9a4d09cb7d5e4f05ef84c3e780c73f198e1fab170eee
     [expected/printers-calls.log]=2c8aedd971315f09f6d741ac6e891b3dc52459f8ad683122aeb57587ff335a9a
@@ -139,6 +139,8 @@ declare -A SUM=(
     [fixtures/applications/riley.gate-hidden.desktop]=a7685602290d59590e928d1b47127ff6f6d51f751b2876e0d00145163876c9ed
     [fixtures/applications/riley.gate-removed.desktop]=575e35375f0e25fc6ede5fb5297d724e6d04b20d382ee731e6cfbe379d04bdff
     [fixtures/applications/riley.settings.desktop]=802be615d04f884d75e462cceb55e6b95455c3fbe201e66f905ca50d57b143c6
+    [fixtures/ipptool-Office.txt]=6e4ee512a2d35643abbe81f43d91174ba1976696c2dff72ecb485a19507fa5f6
+    [fixtures/ipptool-RileyGate.txt]=fdec04a2c6dd1b9b1565fd8ddeb05ec3f725edb49d65620663d22ccbcbc638aa
     [fixtures/lpoptions-p-Office.txt]=d342f86da4a8aa4fdea99aacfad42d0d9a7754902549617e2d68d0c4f7fc7b34
     [fixtures/lpoptions-p-RileyGate.txt]=bb3aa1b689eb7618ae7aa943713bc1acddeb7025e3585683dcc10c386660ad62
     [fixtures/lpstat-a.txt]=83340e3662ed4e0b554eaf71c0c59ed00523a3cef2d3e2151342999e3f77f5c0
@@ -150,6 +152,7 @@ declare -A SUM=(
     [fakes/_common.sh]=beaaf33b878aa466cfe4786f9feae87e44b18f94e1201479d9beb68997970997
     [fakes/hyprctl]=89232339b844f92c3b52bc95c20489194ca2f33f4a486669999062447af75130
     [fakes/Hyprland]=cc73bb3a55a23d4112ff070241c713c62be2e05f99238f36434e8d56e6234f13
+    [fakes/ipptool]=3f9868f0704403fed153dbf3cfa56ebd2d4823105729307d2cbea633cb2bf1b2
     [fakes/lp]=2e6e9b1c9cd38f5aeeb1722f4bbf6670bdb28020b3044a073cad8c1f40f3a1c7
     [fakes/lpoptions]=fa5769c76ef4be7d30a23ec5d1b97ca9d0b6aaf3d9c6cbdaacf294be92c8290c
     [fakes/lpstat]=18ab17638735f8091667555e7f24ed426d0571f47a489fdb148dd6727968f90b

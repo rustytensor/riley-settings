@@ -507,14 +507,14 @@ private:
         sameBytes(when + QStringLiteral(": values file is the seed"), m_values, readAll(m_seeds + QStringLiteral("/displays-values.xml")));
         sameBytes(when + QStringLiteral(": settings.lua is the live file"), cfg(QStringLiteral("hypr/settings.lua")),
                   QByteArrayLiteral("-- the live file\n"));
-        absent(when + QStringLiteral(": no greeter file"), cfg(QStringLiteral("riley/greeter-sway.conf")));
+        absent(when + QStringLiteral(": no settings.json"), cfg(QStringLiteral("hypr/settings.json")));
         absent(when + QStringLiteral(": no hyprpaper.conf"), cfg(QStringLiteral("hypr/hyprpaper.conf")));
     }
 
     void displaysApplied(const QString& when)
     {
         sameAs(when + QStringLiteral(": settings.lua"), cfg(QStringLiteral("hypr/settings.lua")), QStringLiteral("expected-m1.lua"));
-        sameAs(when + QStringLiteral(": greeter file"), cfg(QStringLiteral("riley/greeter-sway.conf")), QStringLiteral("expected-greeter.conf"));
+        sameAs(when + QStringLiteral(": settings.json"), cfg(QStringLiteral("hypr/settings.json")), QStringLiteral("displays-model.json"));
         sameAs(when + QStringLiteral(": hyprpaper.conf"), cfg(QStringLiteral("hypr/hyprpaper.conf")), QStringLiteral("displays-hyprpaper.conf"));
         sameAs(when + QStringLiteral(": values file"), m_values, QStringLiteral("displays-values-applied.xml"));
     }
@@ -709,7 +709,7 @@ private Q_SLOTS:
         logIs(QStringLiteral("displays-actions.log"), 10);
         noUnexpectedCall();
         homeHolds({QStringLiteral(".config/riley/settings.xml"), QStringLiteral(".config/hypr/settings.lua"),
-                   QStringLiteral(".config/riley/greeter-sway.conf"), QStringLiteral(".config/hypr/hyprpaper.conf")});
+                   QStringLiteral(".config/hypr/settings.json"), QStringLiteral(".config/hypr/hyprpaper.conf")});
         close();
     }
 
@@ -818,10 +818,10 @@ private Q_SLOTS:
         valueIs(accel, QStringLiteral("input.accel_profile"), QStringLiteral("flat"));
         sameAs(QStringLiteral("values file"), m_values, QStringLiteral("keyboard-values.xml"));
         sameAs(QStringLiteral("check 1: settings.lua"), cfg(QStringLiteral("hypr/settings.lua")), QStringLiteral("expected-m3.lua"));
-        sameAs(QStringLiteral("greeter file"), cfg(QStringLiteral("riley/greeter-sway.conf")), QStringLiteral("keyboard-greeter.conf"));
+        sameAs(QStringLiteral("settings.json"), cfg(QStringLiteral("hypr/settings.json")), QStringLiteral("keyboard-model.json"));
         noUnexpectedCall();
         homeHolds({QStringLiteral(".config/riley/settings.xml"), QStringLiteral(".config/hypr/settings.lua"),
-                   QStringLiteral(".config/riley/greeter-sway.conf")});
+                   QStringLiteral(".config/hypr/settings.json")});
         close();
     }
 
