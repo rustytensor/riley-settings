@@ -7,10 +7,20 @@
 #include <QByteArray>
 #include <QString>
 #include <QStringList>
+#include <QVariantMap>
 
 #include <memory>
 
 namespace riley::config {
+
+// Where a writer that finds its own files (Writer::writesOwnFiles) writes, and what the change was.
+struct WriteContext {
+    QString home;          // $HOME
+    QString configHome;    // $XDG_CONFIG_HOME
+    QString cacheHome;     // $XDG_CACHE_HOME
+    QStringList changed;   // the keys this change saved (one user step); empty: write everything
+    QVariantMap pageData;  // what the page that made the change passes on (for example the screens it knows)
+};
 
 class Writer {
 public:
@@ -29,6 +39,12 @@ public:
     // Render, then write the text to `outPath` through writeTargetFile (atomic). Not virtual: every writer's output
     // goes through that one function.
     bool write(const Config& config, const QString& outPath, const QByteArray* existing, QString* error) const;
+
+    // True when the writer finds its own files: more than one, outside $XDG_CONFIG_HOME, or only the part of a file
+    // that belongs to the keys that changed (riley-dock, riley-desktop). The panel then calls writeFiles instead of
+    // write(). Every file it writes still goes through writeTargetFile (atomic, by rename).
+    virtual bool writesOwnFiles() const { return false; }
+    virtual bool writeFiles(const Config& config, const WriteContext& context, QString* error) const;
 };
 
 // The writer for `target`, or null when there is none.

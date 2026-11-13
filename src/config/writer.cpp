@@ -18,6 +18,8 @@ const std::vector<std::unique_ptr<Writer>>& registry()
         w.push_back(writers::makeHypridle());
         w.push_back(writers::makeHyprpaper());
         w.push_back(writers::makeGreeterSway());
+        w.push_back(writers::makeRileyDock());
+        w.push_back(writers::makeRileyDesktop());
         return w;
     }();
     return writers;
@@ -31,6 +33,12 @@ bool Writer::write(const Config& config, const QString& outPath, const QByteArra
     if (!render(config, existing, &text, error))
         return false;
     return writeTargetFile(outPath, text, error);
+}
+
+bool Writer::writeFiles(const Config&, const WriteContext&, QString* error) const
+{
+    *error = target() + QStringLiteral(": this writer writes one file, through write()");
+    return false;
 }
 
 const Writer* findWriter(const QString& target)

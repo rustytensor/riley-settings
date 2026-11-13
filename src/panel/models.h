@@ -3,6 +3,8 @@
 //
 // A change (OptionItem::commit / commitNumber / commitItems) goes through the Controller, which in order: saves the
 // values file (config::storeValue / storeList), runs the writers of the option's targets, then its actions.
+// The custom pages (M3, docs/pages-contract.md) make their changes through Controller::commitStep, which does the
+// same for several options at once (each writer and each action once).
 #pragma once
 
 #include "config/description.h"
@@ -11,8 +13,10 @@
 #include <QList>
 #include <QObject>
 #include <QString>
+#include <QStringList>
 #include <QUrl>
 #include <QVariant>
+#include <QVariantMap>
 #include <QtQml/qqmlregistration.h>
 
 #include <memory>
@@ -27,6 +31,7 @@ class OptionItem : public QObject {
     QML_ELEMENT
     QML_UNCREATABLE("made by the panel from the description")
     Q_PROPERTY(QString key READ key CONSTANT)
+    Q_PROPERTY(QString role READ role CONSTANT)
     Q_PROPERTY(QString type READ type CONSTANT)
     Q_PROPERTY(QString label READ label CONSTANT)
     Q_PROPERTY(QString help READ help CONSTANT)
@@ -47,6 +52,7 @@ public:
     OptionItem(Controller* controller, const config::Option* shown, const config::Option* bound, QObject* parent);
 
     QString key() const { return m_shown->key; }
+    QString role() const { return m_shown->role; }
     QString type() const;
     QString label() const { return m_shown->label; }
     QString help() const { return m_shown->help; }
@@ -61,6 +67,7 @@ public:
     QString valueText() const { return m_valueText; }
     QVariantList items() const { return m_items; }
 
+    const config::Option* shown() const { return m_shown; }
     const config::Option* bound() const { return m_bound; }
 
     // A change. False (and nothing touched) when the value is refused; the reason is the controller's message.
@@ -121,6 +128,10 @@ class PageItem : public QObject {
     Q_PROPERTY(QString icon READ icon CONSTANT)
     Q_PROPERTY(QString widget READ widget CONSTANT)
     Q_PROPERTY(QList<QObject*> sections READ sections CONSTANT)
+    // A widget page's options (OptionItem), in file order; empty for a page drawn from sections.
+    Q_PROPERTY(QList<QObject*> options READ options CONSTANT)
+    // The same without the lists: what a widget page draws as M2 controls (docs/pages-contract.md, "Rules").
+    Q_PROPERTY(QList<QObject*> scalarOptions READ scalarOptions CONSTANT)
 
 public:
     PageItem(const config::Page& page, QObject* parent) : QObject(parent), m_page(page) {}
@@ -130,11 +141,18 @@ public:
     QString icon() const { return m_page.icon; }
     QString widget() const { return m_page.widget; }
     QList<QObject*> sections() const { return m_sections; }
+    QList<QObject*> options() const { return m_options; }
+    QList<QObject*> scalarOptions() const;
     void add(SectionItem* s) { m_sections.append(s); }
+    void addOption(OptionItem* o) { m_options.append(o); }
+
+    // The page's option with role="<role>" in settings.xml, or null. How a page finds an option without its key.
+    Q_INVOKABLE riley::panel::OptionItem* optionByRole(const QString& role) const;
 
 private:
     const config::Page& m_page;
     QList<QObject*> m_sections;
+    QList<QObject*> m_options;
 };
 
 struct Paths {
@@ -143,6 +161,17 @@ struct Paths {
     QString values;        // your values file
     QString configHome;    // $XDG_CONFIG_HOME: where the targets are written
     QString actionLog;     // $RILEY_SETTINGS_ACTION_LOG, or empty
+    QString home;          // $HOME
+    QString cacheHome;     // $XDG_CACHE_HOME (default ~/.cache)
+    QString dataHome;      // $XDG_DATA_HOME (default ~/.local/share)
+    QStringList dataDirs;  // $XDG_DATA_DIRS (default /usr/local/share:/usr/share)
+};
+
+// One value a page step saves: a scalar's text, or a list's items (when the option is a list).
+struct Change {
+    const config::Option* option = nullptr;
+    QString text;
+    QList<config::ItemFields> items;
 };
 
 class Controller : public QObject {
@@ -151,6 +180,8 @@ class Controller : public QObject {
     QML_UNCREATABLE("made by the panel")
     Q_PROPERTY(QList<QObject*> pages READ pages CONSTANT)
     Q_PROPERTY(QString message READ message NOTIFY messageChanged)
+    // True in the M3 gate's planted-fault build (-DRILEY_PLANT_FAULT_PAGES=ON), for faults planted in QML.
+    Q_PROPERTY(bool plantFaultPages READ plantFaultPages CONSTANT)
 
 public:
     // Null with a one-line *error when the description or the values file cannot be read.
@@ -167,6 +198,32 @@ public:
     bool commit(const config::Option& option, const QString& text);
     bool commitItems(const config::Option& option, const QList<config::ItemFields>& items);
 
+    // ---- for the custom pages' backends (src/panel/pages/) ----
+    static bool plantFaultPages();
+    bool applyActions() const { return m_applyActions; }
+    const Paths& paths() const { return m_paths; }
+    const config::Description& description() const { return *m_description; }
+    const config::Values& values() const { return *m_values; }
+    OptionItem* optionItem(const config::Option& option) const;
+
+    // One user step of a page: saves every change that differs from the values file, then runs each writer of their
+    // targets once (in order of first appearance; `pageData` goes to writers that find their own files) and records
+    // each of their actions once. A step that changes nothing writes nothing and returns true. A refused value
+    // writes nothing (the values file is put back as it was) and returns false with the reason in `message`.
+    bool commitStep(const QList<Change>& changes, const QVariantMap& pageData = {});
+
+    // The file a single-file target is written to (absolute), or empty for a target that finds its own files.
+    QString targetPath(const QString& target) const;
+    // Re-read the values file (after a page wrote it back itself, as the displays' Revert does) and refresh every
+    // control. False with the reason in `message` when it cannot be read.
+    bool reloadFromDisk();
+    // Record (and with --apply-actions run) these actions, as after a change.
+    void recordActions(const QStringList& actions);
+    // A launch of another program: `launch <program>` in the action log; run only with --apply-actions.
+    Q_INVOKABLE void launch(const QString& program);
+    // A refusal or a note: the panel's one-line message.
+    Q_INVOKABLE void setMessage(const QString& text);
+
     Q_INVOKABLE void clearMessage();
 
 Q_SIGNALS:
@@ -175,10 +232,9 @@ Q_SIGNALS:
 private:
     explicit Controller(QObject* parent = nullptr) : QObject(parent) {}
     bool reloadValues(QString* error);
-    void afterSave(const config::Option& option);
-    bool runWriters(const config::Option& option);
-    void runActions(const config::Option& option);
-    void setMessage(const QString& text);
+    void afterSave(const QList<const config::Option*>& options, const QVariantMap& pageData);
+    bool runWriters(const QStringList& targets, const QStringList& changedKeys, const QVariantMap& pageData);
+    void appendLog(const QString& line);
 
     Paths m_paths;
     bool m_applyActions = false;
@@ -186,7 +242,7 @@ private:
     std::unique_ptr<config::Values> m_values;
     std::vector<config::Page> m_sortedPages;
     QList<QObject*> m_pages;
-    QList<OptionItem*> m_options;
+    QList<OptionItem*> m_options;   // one per option, in description order
     QString m_message;
 };
 

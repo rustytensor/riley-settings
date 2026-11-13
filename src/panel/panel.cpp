@@ -37,6 +37,11 @@ bool load(QQmlApplicationEngine& engine, const LoadOptions& options, QString* er
                                                 : options.valuesPath;
     paths.configHome = configHome;
     paths.actionLog = qEnvironmentVariable("RILEY_SETTINGS_ACTION_LOG");
+    paths.home = QDir::homePath();
+    paths.cacheHome = envOr("XDG_CACHE_HOME", paths.home + QStringLiteral("/.cache"));
+    paths.dataHome = envOr("XDG_DATA_HOME", paths.home + QStringLiteral("/.local/share"));
+    paths.dataDirs = envOr("XDG_DATA_DIRS", QStringLiteral("/usr/local/share:/usr/share"))
+                         .split(QLatin1Char(':'), Qt::SkipEmptyParts);
 
     QString why;
     Controller* controller = Controller::create(paths, options.applyActions, &why);

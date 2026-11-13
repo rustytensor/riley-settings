@@ -205,6 +205,7 @@ std::unique_ptr<Description> Description::load(const QString& path, const QStrin
         Option o;
         readTyped(node, &o);
         o.key = xml::attr(node, "key");
+        o.role = xml::attr(node, "role");
         o.targets = xml::attr(node, "target").split(QLatin1Char(' '), Qt::SkipEmptyParts);
         o.actions = xml::attr(node, "action").split(QLatin1Char(' '), Qt::SkipEmptyParts);
         for (const xmlNode* c = xml::firstChild(node); c; c = xml::next(c)) {

@@ -18,6 +18,12 @@ ApplicationWindow {
     title: qsTr("Riley Settings")
     color: palette.window
 
+    // The system-launcher page has no page of its own: its menu entry launches the system's settings.
+    SystemLauncher {
+        id: systemLauncher
+        panel: window.panel
+    }
+
     RowLayout {
         anchors.fill: parent
         spacing: 0
@@ -48,7 +54,12 @@ ApplicationWindow {
                             width: parent ? parent.width : 0
                             text: modelData.title
                             highlighted: index === window.current
-                            onClicked: window.current = index
+                            onClicked: {
+                                if (modelData.widget === "system-launcher")
+                                    systemLauncher.launch()   // the page shown stays on screen
+                                else
+                                    window.current = index
+                            }
                         }
                     }
                 }
@@ -125,7 +136,32 @@ ApplicationWindow {
 
                         required property PageItem modelData
 
-                        sourceComponent: modelData.widget !== "" ? widgetPage : drawnPage
+                        // M3: a widget page is drawn by its own component (qml/pages/); a widget with no component
+                        // here shows the placeholder, as in M2.
+                        readonly property var widgetPages: ({
+                            "displays": displaysPage,
+                            "printers": printersPage,
+                            "keyboard-mouse": keyboardMousePage,
+                            "theme-wallpaper": themeWallpaperPage,
+                            "dock": dockPage,
+                            "desktop": desktopPage
+                        })
+
+                        sourceComponent: modelData.widget === "" ? drawnPage
+                                                                 : (widgetPages[modelData.widget] ?? widgetPage)
+
+                        Component { id: displaysPage; Displays { panel: window.panel; page: pageLoader.modelData } }
+                        Component { id: printersPage; Printers { panel: window.panel; page: pageLoader.modelData } }
+                        Component {
+                            id: keyboardMousePage
+                            KeyboardMouse { panel: window.panel; page: pageLoader.modelData }
+                        }
+                        Component {
+                            id: themeWallpaperPage
+                            ThemeWallpaper { panel: window.panel; page: pageLoader.modelData }
+                        }
+                        Component { id: dockPage; Dock { panel: window.panel; page: pageLoader.modelData } }
+                        Component { id: desktopPage; Desktop { panel: window.panel; page: pageLoader.modelData } }
 
                         Component {
                             id: drawnPage
@@ -152,7 +188,7 @@ ApplicationWindow {
                             }
                         }
 
-                        // M2: a page drawn by its own component (M3) shows a placeholder naming that component.
+                        // A widget page with no component here shows a placeholder naming that component.
                         Component {
                             id: widgetPage
 

@@ -9,6 +9,8 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(RILEY_PLANT_FAULT "Plant the gate's fault in the writers' output (tests only)" OFF)
 # The M2 gate's planted fault: the second option's control is bound to the third option's key.
 option(RILEY_PLANT_FAULT_PANEL "Plant the gate's fault in the panel's bindings (tests only)" OFF)
+# The M3 gate's planted faults: one per custom page (docs/pages-contract.md, "The planted faults").
+option(RILEY_PLANT_FAULT_PAGES "Plant the M3 gate's faults in the custom pages (tests only)" OFF)
 
 include(GNUInstallDirs)
 find_package(Qt6 6.11 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2)
@@ -36,6 +38,10 @@ add_library(riley-config-core STATIC
     src/config/writers/hypridle.cpp
     src/config/writers/hyprpaper.cpp
     src/config/writers/greeter-sway.cpp
+    src/config/writers/riley-dock.cpp
+    src/config/writers/riley-desktop.cpp
+    src/config/writers/desktop-layout.cpp
+    src/config/writers/desktop-layout.h
 )
 target_include_directories(riley-config-core PUBLIC src)
 target_link_libraries(riley-config-core PUBLIC Qt6::Core PRIVATE LibXml2::LibXml2)
@@ -68,7 +74,35 @@ set(RILEY_PANEL_QML
     qml/KeyBindingControl.qml
     qml/ListControl.qml
 )
-foreach(f ${RILEY_PANEL_QML})
+# M3: one component per custom page (docs/pages-contract.md), plus the shared PageOptions. Each file is a type of the
+# module under its own name (Displays, Printers, ...), next to the M2 controls.
+set(RILEY_PAGES_QML
+    qml/pages/PageOptions.qml
+    qml/pages/Displays.qml
+    qml/pages/Printers.qml
+    qml/pages/KeyboardMouse.qml
+    qml/pages/ThemeWallpaper.qml
+    qml/pages/Dock.qml
+    qml/pages/Desktop.qml
+)
+# The pages' backends, one per page, plus what they share (common.*).
+set(RILEY_PAGES_SOURCES
+    src/panel/pages/common.cpp src/panel/pages/common.h
+    src/panel/pages/displays.cpp src/panel/pages/displays.h
+    src/panel/pages/printers.cpp src/panel/pages/printers.h
+    src/panel/pages/keyboardmouse.cpp src/panel/pages/keyboardmouse.h
+    src/panel/pages/themewallpaper.cpp src/panel/pages/themewallpaper.h
+    src/panel/pages/dock.cpp src/panel/pages/dock.h
+    src/panel/pages/desktop.cpp src/panel/pages/desktop.h
+    src/panel/pages/systemlauncher.cpp src/panel/pages/systemlauncher.h
+)
+# The writers that the pages' faults may reach (riley-desktop's layout).
+set(RILEY_PAGES_WRITER_SOURCES
+    src/config/writers/riley-dock.cpp
+    src/config/writers/riley-desktop.cpp
+    src/config/writers/desktop-layout.cpp
+)
+foreach(f ${RILEY_PANEL_QML} ${RILEY_PAGES_QML})
     get_filename_component(name ${f} NAME)
     set_source_files_properties(${f} PROPERTIES QT_RESOURCE_ALIAS ${name})
 endforeach()
@@ -81,10 +115,10 @@ set_target_properties(riley-settings-panel PROPERTIES AUTOMOC ON)   # before qt_
 qt_add_qml_module(riley-settings-panel
     URI Riley.Settings
     VERSION 1.0
-    QML_FILES ${RILEY_PANEL_QML}
-    SOURCES src/panel/models.cpp src/panel/models.h
+    QML_FILES ${RILEY_PANEL_QML} ${RILEY_PAGES_QML}
+    SOURCES src/panel/models.cpp src/panel/models.h ${RILEY_PAGES_SOURCES}
 )
-target_include_directories(riley-settings-panel PUBLIC src PRIVATE src/panel)   # src/panel: for the generated type registration
+target_include_directories(riley-settings-panel PUBLIC src PRIVATE src/panel src/panel/pages)   # for the generated type registration
 target_link_libraries(riley-settings-panel
     PUBLIC Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick riley-settings-panelplugin
     PRIVATE riley-config-core Qt6::QuickControls2)
@@ -92,6 +126,14 @@ target_compile_definitions(riley-settings-panel PRIVATE RILEY_SETTINGS_SHARE_DIR
 if(RILEY_PLANT_FAULT_PANEL)
     message(WARNING "RILEY_PLANT_FAULT_PANEL is ON: the second option is bound to the third option's key (gate builds only)")
     target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_PANEL)
+endif()
+if(RILEY_PLANT_FAULT_PAGES)
+    message(WARNING "RILEY_PLANT_FAULT_PAGES is ON: one fault per custom page (gate builds only)")
+    # The page sources, the controller (Controller::plantFaultPages, for faults planted in QML) and the pages' writers.
+    set_property(SOURCE ${RILEY_PAGES_SOURCES} src/panel/models.cpp
+                 TARGET_DIRECTORY riley-settings-panel APPEND PROPERTY COMPILE_DEFINITIONS RILEY_PLANT_FAULT_PAGES)
+    set_property(SOURCE ${RILEY_PAGES_WRITER_SOURCES}
+                 TARGET_DIRECTORY riley-config-core APPEND PROPERTY COMPILE_DEFINITIONS RILEY_PLANT_FAULT_PAGES)
 endif()
 
 qt_add_executable(riley-settings-qt src/app/main.cpp)

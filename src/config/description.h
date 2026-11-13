@@ -47,6 +47,7 @@ struct Field : Typed {
 
 struct Option : Typed {
     QString key;
+    QString role;          // what a widget page uses the option for (role="pins"); empty for most options
     QList<Field> fields;   // list only
     QStringList targets;
     QStringList actions;

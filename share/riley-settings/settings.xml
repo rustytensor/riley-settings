@@ -7,7 +7,7 @@
 
   <page id="displays" title="Displays" order="10" icon="video-display-symbolic" widget="displays"
         help="Drag a screen to move it; it snaps to the edge of its neighbour. Changes take effect when you press Apply.">
-    <option key="display.monitors" label="Screens"
+    <option key="display.monitors" role="screens" label="Screens"
             help="Every screen by its description, in order. Apply checks the result first and undoes it by itself after 15 seconds unless you keep it."
             type="list" target="hyprland-lua greeter-sway hyprpaper" action="hyprland-reload greeter-sync">
       <field name="desc" type="text" label="Screen"/>
@@ -115,12 +115,12 @@
   <page id="theme" title="Theme and Wallpaper" order="50" icon="preferences-desktop-wallpaper-symbolic"
         widget="theme-wallpaper"
         help="Drag a picture onto a screen to use it there; click a picture to use it on every screen.">
-    <option key="theme.name" label="Theme"
+    <option key="theme.name" role="theme" label="Theme"
             help="Recolours the whole desktop: borders, bar, dock, menus, terminal, prompt, apps, and sets its wallpapers."
             type="text" default="" target="theme" action="theme-fonts"/>
-    <option key="wallpaper.picture" label="Wallpaper" help="The picture on every screen without its own"
+    <option key="wallpaper.picture" role="picture" label="Wallpaper" help="The picture on every screen without its own"
             type="file" default="" target="hyprpaper" action="hyprpaper-reload"/>
-    <option key="wallpaper.screens" label="Wallpaper per screen" help="A picture of its own for one screen"
+    <option key="wallpaper.screens" role="screen-pictures" label="Wallpaper per screen" help="A picture of its own for one screen"
             type="list" target="hyprpaper" action="hyprpaper-reload">
       <field name="screen" type="text" label="Screen"/>
       <field name="path" type="file" label="Picture"/>
@@ -129,11 +129,11 @@
 
   <page id="dock" title="Dock" order="60" icon="view-app-grid-symbolic" widget="dock"
         help="Drag icons along the dock to arrange them. Drag an app onto the dock to add it; drag a dock icon onto Remove to take it off.">
-    <option key="dock.pins" label="Apps on the dock" help="In dock order, by app id" type="list"
+    <option key="dock.pins" role="pins" label="Apps on the dock" help="In dock order, by app id" type="list"
             target="riley-dock" action="dock-reload">
       <field name="app" type="text" label="App"/>
     </option>
-    <option key="dock.screens" label="Screens"
+    <option key="dock.screens" role="screens" label="Screens"
             help="Choose screens by their descriptions, not their ports. If none match, the dock uses the top-left screen."
             type="list" target="riley-dock" action="dock-reload">
       <field name="desc" type="text" label="Screen"/>
@@ -158,15 +158,15 @@
 
   <page id="desktop" title="Desktop" order="80" icon="user-desktop-symbolic" widget="desktop"
         help="~/Desktop and each folder in it get a box by themselves; Add Folder gives any other folder one. The desktop follows changes within a second.">
-    <option key="desktop.show" label="Boxes on the desktop" help="Frosted boxes showing your folders"
+    <option key="desktop.show" role="show" label="Boxes on the desktop" help="Frosted boxes showing your folders"
             type="switch" default="true" target="riley-desktop" action="desktop-reload"/>
-    <option key="desktop.boxes" label="Boxes" help="Move a box by its title, resize it by its corner; right-click it to send it to another screen."
+    <option key="desktop.boxes" role="boxes" label="Boxes" help="Move a box by its title, resize it by its corner; right-click it to send it to another screen."
             type="list" target="riley-desktop" action="desktop-reload">
       <field name="folder" type="folder" label="Folder"/>
       <field name="screen" type="text" label="Screen"/>
       <field name="hidden" type="switch" default="false" label="Hidden"/>
     </option>
-    <option key="desktop.icon_size" label="Icon size" type="slider" default="48" min="32" max="96" step="8"
+    <option key="desktop.icon_size" role="icon-size" label="Icon size" type="slider" default="48" min="32" max="96" step="8"
             target="riley-desktop" action="desktop-reload"/>
   </page>
 

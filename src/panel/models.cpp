@@ -1,6 +1,7 @@
 #include "models.h"
 
 #include "config/config.h"
+#include "config/atomic_file.h"
 #include "config/writer.h"
 
 #include <QDir>
@@ -91,6 +92,30 @@ QVariantList choiceList(const QList<config::Choice>& choices)
 }
 
 }  // namespace
+
+// ---- PageItem -------------------------------------------------------------------------------------------------
+
+QList<QObject*> PageItem::scalarOptions() const
+{
+    QList<QObject*> out;
+    for (QObject* o : m_options) {
+        if (static_cast<OptionItem*>(o)->type() != QLatin1String("list"))
+            out.append(o);
+    }
+    return out;
+}
+
+OptionItem* PageItem::optionByRole(const QString& role) const
+{
+    if (role.isEmpty())
+        return nullptr;
+    for (QObject* o : m_options) {
+        auto* item = static_cast<OptionItem*>(o);
+        if (item->role() == role)
+            return item;
+    }
+    return nullptr;
+}
 
 // ---- OptionItem -----------------------------------------------------------------------------------------------
 
@@ -210,13 +235,16 @@ Controller* Controller::create(const Paths& paths, bool applyActions, QString* e
                      [](const config::Page& a, const config::Page& b) { return a.order < b.order; });
     for (const config::Page& page : c->m_sortedPages) {
         auto* p = new PageItem(page, c.get());
-        if (page.widget.isEmpty()) {   // a widget page's options belong to its own component (M3)
+        if (page.widget.isEmpty()) {
             for (const config::Section& section : page.sections) {
                 auto* s = new SectionItem(section.title, section.help, p);
                 for (int idx : section.options)
                     s->add(byIndex[size_t(idx)]);
                 p->add(s);
             }
+        } else {   // a widget page's options belong to its own component (M3), which finds them by role
+            for (int idx : page.options)
+                p->addOption(byIndex[size_t(idx)]);
         }
         c->m_pages.append(p);
     }
@@ -275,23 +303,10 @@ bool Controller::commit(const config::Option& option, const QString& text)
         setMessage(option.label + QStringLiteral(": a list is changed item by item"));
         return false;
     }
-    // The same value again is no change: nothing is saved, written or run.
-    const QString current = config::Config(*m_description, *m_values).text(option.key);
-    if (text == current)
-        return true;
-    if (option.type == OptionType::Slider || option.type == OptionType::Number) {
-        double a = 0, b = 0;
-        if (config::parseNumber(text.trimmed(), &a) && config::parseNumber(current.trimmed(), &b) && a == b)
-            return true;
-    }
-    QString error;
-    QDir().mkpath(QFileInfo(m_paths.values).absolutePath());
-    if (!config::storeValue(m_paths.values, *m_description, m_paths.schemaDir, option.key, text, &error)) {
-        setMessage(option.label + QStringLiteral(": ") + error);
-        return false;
-    }
-    afterSave(option);
-    return true;
+    Change change;
+    change.option = &option;
+    change.text = text;
+    return commitStep({change});
 }
 
 bool Controller::commitItems(const config::Option& option, const QList<config::ItemFields>& items)
@@ -300,26 +315,110 @@ bool Controller::commitItems(const config::Option& option, const QList<config::I
         setMessage(option.label + QStringLiteral(": not a list"));
         return false;
     }
-    QVariantList asVariant;
-    for (const config::ItemFields& item : items) {
-        QVariantMap m;
-        for (const config::Field& f : option.fields)
-            m.insert(f.name, item.contains(f.name) ? item.value(f.name) : f.defaultValue.value_or(QString()));
-        asVariant.append(m);
+    Change change;
+    change.option = &option;
+    change.items = items;
+    return commitStep({change});
+}
+
+bool Controller::plantFaultPages()
+{
+#ifdef RILEY_PLANT_FAULT_PAGES
+    return true;
+#else
+    return false;
+#endif
+}
+
+OptionItem* Controller::optionItem(const config::Option& option) const
+{
+    for (OptionItem* o : m_options) {
+        if (o->shown() == &option)
+            return o;
     }
-    if (asVariant == this->items(option))
+    return nullptr;
+}
+
+namespace {
+
+// Whether `change` would leave the values file's value as it is.
+bool unchanged(const Controller& c, const Change& change)
+{
+    const config::Option& option = *change.option;
+    if (option.type == OptionType::List) {
+        QVariantList asVariant;
+        for (const config::ItemFields& item : change.items) {
+            QVariantMap m;
+            for (const config::Field& f : option.fields)
+                m.insert(f.name, item.contains(f.name) ? item.value(f.name) : f.defaultValue.value_or(QString()));
+            asVariant.append(m);
+        }
+        return asVariant == c.items(option);
+    }
+    const QString current = config::Config(c.description(), c.values()).text(option.key);
+    if (change.text == current)
         return true;
-    QString error;
-    QDir().mkpath(QFileInfo(m_paths.values).absolutePath());
-    if (!config::storeList(m_paths.values, *m_description, m_paths.schemaDir, option.key, items, &error)) {
-        setMessage(option.label + QStringLiteral(": ") + error);
-        return false;
+    if (option.type == OptionType::Slider || option.type == OptionType::Number) {
+        double a = 0, b = 0;
+        if (config::parseNumber(change.text.trimmed(), &a) && config::parseNumber(current.trimmed(), &b) && a == b)
+            return true;
     }
-    afterSave(option);
+    return false;
+}
+
+}  // namespace
+
+bool Controller::commitStep(const QList<Change>& changes, const QVariantMap& pageData)
+{
+    // The same value again is no change: nothing is saved, written or run.
+    QList<const Change*> todo;
+    for (const Change& change : changes) {
+        if (!change.option) {
+            setMessage(QStringLiteral("a change without an option"));
+            return false;
+        }
+        if (!unchanged(*this, change))
+            todo.append(&change);
+    }
+    if (todo.isEmpty())
+        return true;
+
+    // What the values file holds now, to put it back if a later value of the step is refused.
+    QByteArray before;
+    bool existed = false;
+    {
+        QFile f(m_paths.values);
+        if (f.open(QIODevice::ReadOnly)) {
+            before = f.readAll();
+            existed = true;
+        }
+    }
+    QDir().mkpath(QFileInfo(m_paths.values).absolutePath());
+    QList<const config::Option*> saved;
+    for (const Change* change : std::as_const(todo)) {
+        const config::Option& option = *change->option;
+        QString error;
+        const bool ok = option.type == OptionType::List
+            ? config::storeList(m_paths.values, *m_description, m_paths.schemaDir, option.key, change->items, &error)
+            : config::storeValue(m_paths.values, *m_description, m_paths.schemaDir, option.key, change->text, &error);
+        if (!ok) {
+            if (!saved.isEmpty()) {   // put the file back as it was before the step
+                QString ignored;
+                if (existed)
+                    config::writeFileAtomic(m_paths.values, before, &ignored);
+                else
+                    QFile::remove(m_paths.values);
+            }
+            setMessage(option.label + QStringLiteral(": ") + error);
+            return false;
+        }
+        saved.append(&option);
+    }
+    afterSave(saved, pageData);
     return true;
 }
 
-void Controller::afterSave(const config::Option& option)
+void Controller::afterSave(const QList<const config::Option*>& options, const QVariantMap& pageData)
 {
     QString error;
     if (!reloadValues(&error)) {
@@ -329,22 +428,65 @@ void Controller::afterSave(const config::Option& option)
     setMessage(QString());
     for (OptionItem* o : std::as_const(m_options))
         o->refresh();
-    if (runWriters(option))
-        runActions(option);
+    QStringList targets, actions, keys;
+    for (const config::Option* option : options) {
+        keys.append(option->key);
+        for (const QString& t : option->targets) {
+            if (!targets.contains(t))
+                targets.append(t);
+        }
+        for (const QString& a : option->actions) {
+            if (!actions.contains(a))
+                actions.append(a);
+        }
+    }
+    if (runWriters(targets, keys, pageData))
+        recordActions(actions);
 }
 
-bool Controller::runWriters(const config::Option& option)
+QString Controller::targetPath(const QString& target) const
+{
+    const QString file = targetFile(target);
+    return file.isEmpty() ? QString() : m_paths.configHome + QLatin1Char('/') + file;
+}
+
+bool Controller::reloadFromDisk()
+{
+    QString error;
+    if (!reloadValues(&error)) {
+        setMessage(error);
+        return false;
+    }
+    for (OptionItem* o : std::as_const(m_options))
+        o->refresh();
+    return true;
+}
+
+bool Controller::runWriters(const QStringList& targets, const QStringList& changedKeys, const QVariantMap& pageData)
 {
     const config::Config cfg(*m_description, *m_values);
     bool ok = true;
-    for (const QString& target : option.targets) {
+    for (const QString& target : targets) {
         const config::Writer* writer = config::findWriter(target);
-        const QString file = targetFile(target);
-        if (!writer || file.isEmpty()) {
+        if (writer && writer->writesOwnFiles()) {
+            config::WriteContext context;
+            context.home = m_paths.home;
+            context.configHome = m_paths.configHome;
+            context.cacheHome = m_paths.cacheHome;
+            context.changed = changedKeys;
+            context.pageData = pageData;
+            QString error;
+            if (!writer->writeFiles(cfg, context, &error)) {
+                setMessage(target + QStringLiteral(": ") + error);
+                ok = false;
+            }
+            continue;
+        }
+        const QString path = targetPath(target);
+        if (!writer || path.isEmpty()) {
             printErr(QStringLiteral("target ") + target + QStringLiteral(" has no writer yet; not written"));
             continue;
         }
-        const QString path = m_paths.configHome + QLatin1Char('/') + file;
         QDir().mkpath(QFileInfo(path).absolutePath());
         QByteArray existing;
         bool haveExisting = false;
@@ -364,18 +506,23 @@ bool Controller::runWriters(const config::Option& option)
     return ok;
 }
 
-void Controller::runActions(const config::Option& option)
+void Controller::appendLog(const QString& line)
 {
-    for (const QString& action : option.actions) {
+    if (m_paths.actionLog.isEmpty())
+        return;
+    QFile log(m_paths.actionLog);
+    if (log.open(QIODevice::WriteOnly | QIODevice::Append))
+        log.write(line.toUtf8() + '\n');
+    else
+        printErr(m_paths.actionLog + QStringLiteral(": ") + log.errorString());
+}
+
+void Controller::recordActions(const QStringList& actions)
+{
+    for (const QString& action : actions) {
         if (action == QLatin1String("none"))
             continue;
-        if (!m_paths.actionLog.isEmpty()) {
-            QFile log(m_paths.actionLog);
-            if (log.open(QIODevice::WriteOnly | QIODevice::Append))
-                log.write(action.toUtf8() + '\n');
-            else
-                printErr(m_paths.actionLog + QStringLiteral(": ") + log.errorString());
-        }
+        appendLog(action);
         if (!m_applyActions) {
             if (m_paths.actionLog.isEmpty())
                 printErr(QStringLiteral("action ") + action + QStringLiteral(" (not run: start with --apply-actions)"));
@@ -398,6 +545,18 @@ void Controller::runActions(const config::Option& option)
         if (!QProcess::startDetached(program, args))
             setMessage(QStringLiteral("could not run ") + program);
     }
+}
+
+void Controller::launch(const QString& program)
+{
+    appendLog(QStringLiteral("launch ") + program);
+    if (!m_applyActions) {
+        if (m_paths.actionLog.isEmpty())
+            printErr(QStringLiteral("launch ") + program + QStringLiteral(" (not run: start with --apply-actions)"));
+        return;
+    }
+    if (!QProcess::startDetached(program, {}))
+        setMessage(QStringLiteral("could not run ") + program);
 }
 
 void Controller::setMessage(const QString& text)

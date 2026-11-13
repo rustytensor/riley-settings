@@ -42,6 +42,8 @@ Three kinds of file, all XML. The first two are checked against an XML schema (X
   holds no sections, only the `option`s it stores (so their keys, types and defaults are still described here).
 - `option` attributes:
   - `key`: required, unique in the file, lower case, dot-separated (`page.name`). Never reused for another meaning.
+  - `role`: optional. What a page drawn by its own widget uses the option for (`role="pins"`), so the widget
+    finds the option without naming its key. Unique within a page (`xs:unique`). Not a key: renaming the key keeps it.
   - `label`, `help`: what the panel shows.
   - `type`: one of `switch`, `choice`, `slider`, `number`, `text`, `colour`, `font`, `file`, `folder`,
     `keybinding`, `list`.
