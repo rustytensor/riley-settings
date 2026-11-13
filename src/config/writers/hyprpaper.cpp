@@ -1,6 +1,10 @@
 // Writer for the target "hyprpaper": ~/.config/hypr/hyprpaper.conf, the whole file.
-// Not implemented yet: it checks that the description holds the keys it reads, then refuses.
+// Port of Riley's bin/hypr-theme.py set_bg: with no per-screen picture, one catch-all block with wallpaper.picture;
+// otherwise one block per enabled screen of display.monitors, in list order, each with its picture from
+// wallpaper.screens or else wallpaper.picture (a later entry for the same screen wins, as in the Python dict).
 #include "writers.h"
+
+#include <QHash>
 
 namespace riley::config::writers {
 namespace {
@@ -12,7 +16,6 @@ public:
     bool render(const Config& config, const QByteArray* existing, QByteArray* out, QString* error) const override
     {
         Q_UNUSED(existing);
-        Q_UNUSED(out);
         static const QStringList keys = {
             QStringLiteral("display.monitors"),
             QStringLiteral("wallpaper.picture"),
@@ -20,8 +23,26 @@ public:
         };
         if (!config.require(keys, error))
             return false;
-        *error = QStringLiteral("writer hyprpaper: not implemented");
-        return false;
+
+        const QString picture = config.text(QStringLiteral("wallpaper.picture"));
+        QHash<QString, QString> perScreen;
+        for (const Item& item : config.list(QStringLiteral("wallpaper.screens")))
+            perScreen.insert(item.text(QStringLiteral("screen")), item.text(QStringLiteral("path")));
+
+        QByteArray s = "# Written by hypr-theme.py (wallpaper picked in Riley Settings).\nsplash = false\nipc = true\n\n";
+        if (perScreen.isEmpty()) {
+            s += "wallpaper {\n    monitor =\n    path = " + picture.toUtf8() + "\n    fit_mode = cover\n}\n";
+        } else {
+            for (const Item& m : config.list(QStringLiteral("display.monitors"))) {
+                if (!m.flag(QStringLiteral("enabled")))
+                    continue;
+                const QString desc = m.text(QStringLiteral("desc"));
+                s += "wallpaper {\n    monitor = desc:" + desc.toUtf8() + "\n    path = "
+                    + perScreen.value(desc, picture).toUtf8() + "\n    fit_mode = cover\n}\n";
+            }
+        }
+        *out = s;
+        return true;
     }
 };
 
