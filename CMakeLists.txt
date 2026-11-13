@@ -11,6 +11,8 @@ option(RILEY_PLANT_FAULT "Plant the gate's fault in the writers' output (tests o
 option(RILEY_PLANT_FAULT_PANEL "Plant the gate's fault in the panel's bindings (tests only)" OFF)
 # The M3 gate's planted faults: one per custom page (docs/pages-contract.md, "The planted faults").
 option(RILEY_PLANT_FAULT_PAGES "Plant the M3 gate's faults in the custom pages (tests only)" OFF)
+# The M4 gate's planted faults (docs/switch-contract.md, "The planted faults").
+option(RILEY_PLANT_FAULT_SWITCH "Plant the M4 gate's faults in the import, the layout picker and the printer options (tests only)" OFF)
 
 include(GNUInstallDirs)
 find_package(Qt6 6.11 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2)
@@ -23,10 +25,14 @@ set(RILEY_SETTINGS_SHARE_DIR "${CMAKE_INSTALL_FULL_DATADIR}/riley-settings")
 add_library(riley-config-core STATIC
     src/config/atomic_file.cpp
     src/config/atomic_file.h
+    src/config/check.cpp
+    src/config/check.h
     src/config/config.cpp
     src/config/config.h
     src/config/description.cpp
     src/config/description.h
+    src/config/import.cpp
+    src/config/import.h
     src/config/values.cpp
     src/config/values.h
     src/config/writer.cpp
@@ -38,6 +44,7 @@ add_library(riley-config-core STATIC
     src/config/writers/hypridle.cpp
     src/config/writers/hyprpaper.cpp
     src/config/writers/greeter-sway.cpp
+    src/config/writers/riley-model.cpp
     src/config/writers/riley-dock.cpp
     src/config/writers/riley-desktop.cpp
     src/config/writers/desktop-layout.cpp
@@ -122,7 +129,6 @@ target_include_directories(riley-settings-panel PUBLIC src PRIVATE src/panel src
 target_link_libraries(riley-settings-panel
     PUBLIC Qt6::Core Qt6::Gui Qt6::Qml Qt6::Quick riley-settings-panelplugin
     PRIVATE riley-config-core Qt6::QuickControls2)
-target_compile_definitions(riley-settings-panel PRIVATE RILEY_SETTINGS_SHARE_DIR="${RILEY_SETTINGS_SHARE_DIR}")
 if(RILEY_PLANT_FAULT_PANEL)
     message(WARNING "RILEY_PLANT_FAULT_PANEL is ON: the second option is bound to the third option's key (gate builds only)")
     target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_PANEL)
@@ -136,9 +142,16 @@ if(RILEY_PLANT_FAULT_PAGES)
                  TARGET_DIRECTORY riley-config-core APPEND PROPERTY COMPILE_DEFINITIONS RILEY_PLANT_FAULT_PAGES)
 endif()
 
+if(RILEY_PLANT_FAULT_SWITCH)
+    message(WARNING "RILEY_PLANT_FAULT_SWITCH is ON: the M4 gate's planted faults (gate builds only)")
+    target_compile_definitions(riley-config-core PRIVATE RILEY_PLANT_FAULT_SWITCH)
+    target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_SWITCH)
+endif()
+
+# riley-settings-qt finds its share directory at <its dir>/../share/riley-settings (or $RILEY_SETTINGS_SHARE).
 qt_add_executable(riley-settings-qt src/app/main.cpp)
 set_target_properties(riley-settings-qt PROPERTIES AUTOMOC ON)
-target_link_libraries(riley-settings-qt PRIVATE riley-settings-panel Qt6::Gui Qt6::Quick Qt6::QuickControls2)
+target_link_libraries(riley-settings-qt PRIVATE riley-settings-panel riley-config-core Qt6::Gui Qt6::Quick Qt6::QuickControls2)
 target_compile_definitions(riley-settings-qt PRIVATE QT_NO_KEYWORDS QT_NO_CAST_FROM_ASCII)
 set_target_properties(riley-settings-qt PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
 

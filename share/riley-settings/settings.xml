@@ -9,7 +9,7 @@
         help="Drag a screen to move it; it snaps to the edge of its neighbour. Changes take effect when you press Apply.">
     <option key="display.monitors" role="screens" label="Screens"
             help="Every screen by its description, in order. Apply checks the result first and undoes it by itself after 15 seconds unless you keep it."
-            type="list" target="hyprland-lua greeter-sway hyprpaper" action="hyprland-reload greeter-sync">
+            type="list" target="hyprland-lua riley-model hyprpaper" action="hyprland-reload greeter-sync">
       <field name="desc" type="text" label="Screen"/>
       <field name="enabled" type="switch" default="true" label="Use this screen"/>
       <field name="mode" type="text" label="Resolution and refresh rate" help="For example 2560x1440@59.95"/>
@@ -32,13 +32,13 @@
         help="Your desktop changes as you drag; changes save themselves.">
     <section title="Windows">
       <option key="appearance.gaps_in" label="Space between windows" type="slider" default="6" min="0" max="30" step="1"
-              target="hyprland-lua" action="hyprland-reload"/>
+              target="hyprland-lua riley-model" action="hyprland-reload"/>
       <option key="appearance.gaps_out" label="Space at the screen edges" type="slider" default="14" min="0" max="60" step="1"
-              target="hyprland-lua" action="hyprland-reload"/>
+              target="hyprland-lua riley-model" action="hyprland-reload"/>
       <option key="appearance.border_size" label="Border" help="The coloured frame; the active window gets the theme's gradient"
-              type="slider" default="2" min="0" max="8" step="1" target="hyprland-lua" action="hyprland-reload"/>
+              type="slider" default="2" min="0" max="8" step="1" target="hyprland-lua riley-model" action="hyprland-reload"/>
       <option key="appearance.rounding" label="Rounded corners" type="slider" default="12" min="0" max="24" step="1"
-              target="hyprland-lua" action="hyprland-reload"/>
+              target="hyprland-lua riley-model" action="hyprland-reload"/>
       <option key="appearance.workspaces" label="Workspaces"
               help="Tiled or floating windows; Super+Alt+T switches the workspace you are on"
               type="choice" default="tiled" target="float-mode" action="none">
@@ -48,20 +48,20 @@
     </section>
     <section title="Transparency and effects">
       <option key="appearance.active_opacity" label="Active window" help="How solid the window you are working in is"
-              type="slider" default="1.0" min="0.5" max="1.0" step="0.01" target="hyprland-lua" action="hyprland-reload"/>
+              type="slider" default="1.0" min="0.5" max="1.0" step="0.01" target="hyprland-lua riley-model" action="hyprland-reload"/>
       <option key="appearance.inactive_opacity" label="Other windows"
               help="Lower lets the wallpaper show through the windows you are not using"
-              type="slider" default="0.94" min="0.5" max="1.0" step="0.01" target="hyprland-lua" action="hyprland-reload"/>
+              type="slider" default="0.94" min="0.5" max="1.0" step="0.01" target="hyprland-lua riley-model" action="hyprland-reload"/>
       <option key="appearance.blur" label="Frosted glass" help="Blur behind see-through windows, the bar and menus"
-              type="switch" default="true" target="hyprland-lua" action="hyprland-reload"/>
+              type="switch" default="true" target="hyprland-lua riley-model" action="hyprland-reload"/>
       <option key="appearance.blur_size" label="Strength" type="slider" default="7" min="1" max="20" step="1"
-              target="hyprland-lua" action="hyprland-reload"/>
+              target="hyprland-lua riley-model" action="hyprland-reload"/>
       <option key="appearance.blur_passes" label="Smoothness" help="More is smoother and costs a little more GPU"
-              type="slider" default="3" min="1" max="4" step="1" target="hyprland-lua" action="hyprland-reload"/>
+              type="slider" default="3" min="1" max="4" step="1" target="hyprland-lua riley-model" action="hyprland-reload"/>
       <option key="appearance.shadow" label="Shadows" help="A soft shadow under every window"
-              type="switch" default="true" target="hyprland-lua" action="hyprland-reload"/>
+              type="switch" default="true" target="hyprland-lua riley-model" action="hyprland-reload"/>
       <option key="appearance.animations" label="Animations" help="Windows and workspaces glide instead of jumping"
-              type="switch" default="true" target="hyprland-lua" action="hyprland-reload"/>
+              type="switch" default="true" target="hyprland-lua riley-model" action="hyprland-reload"/>
     </section>
     <section title="Fonts" help="Your choices override the theme. Other theme settings and wallpapers stay as they are.">
       <option key="fonts.sans" label="Interface font" help="Empty: the theme's own font"
@@ -83,28 +83,28 @@
   <page id="input" title="Keyboard and Mouse" order="40" icon="input-keyboard-symbolic" widget="keyboard-mouse"
         help="Live as you change it; saves itself.">
     <option key="input.kb_layout" label="Layout" help="One layout, or two separated by a comma (us,ro)"
-            type="text" default="us" target="hyprland-lua greeter-sway" action="hyprland-reload greeter-sync"/>
+            type="text" default="us" target="hyprland-lua riley-model" action="hyprland-reload greeter-sync"/>
     <option key="input.kb_variant" label="Layout variants" help="One per layout, separated by a comma"
-            type="text" default="" target="hyprland-lua" action="hyprland-reload"/>
+            type="text" default="" target="hyprland-lua riley-model" action="hyprland-reload"/>
     <option key="input.kb_options" label="Keyboard options" help="For example grp:alt_shift_toggle: the key that switches layouts"
-            type="text" default="" target="hyprland-lua" action="hyprland-reload"/>
+            type="text" default="" target="hyprland-lua riley-model" action="hyprland-reload"/>
     <option key="input.repeat_delay" label="Delay before repeating" help="Milliseconds you hold a key before it repeats"
-            type="slider" default="600" min="150" max="1000" step="10" target="hyprland-lua" action="hyprland-reload"/>
+            type="slider" default="600" min="150" max="1000" step="10" target="hyprland-lua riley-model" action="hyprland-reload"/>
     <option key="input.repeat_rate" label="Repeat speed" help="Repeats per second"
-            type="slider" default="25" min="10" max="60" step="1" target="hyprland-lua" action="hyprland-reload"/>
+            type="slider" default="25" min="10" max="60" step="1" target="hyprland-lua riley-model" action="hyprland-reload"/>
     <option key="input.sensitivity" label="Pointer speed" help="0 is normal"
-            type="slider" default="0" min="-1" max="1" step="0.05" target="hyprland-lua" action="hyprland-reload"/>
+            type="slider" default="0" min="-1" max="1" step="0.05" target="hyprland-lua riley-model" action="hyprland-reload"/>
     <option key="input.accel_profile" label="Acceleration"
             help="Faster movements go further; flat is better for precise work and games"
-            type="choice" default="adaptive" target="hyprland-lua" action="hyprland-reload">
+            type="choice" default="adaptive" target="hyprland-lua riley-model" action="hyprland-reload">
       <choice value="adaptive" label="On"/>
       <choice value="flat" label="Off"/>
       <choice value="custom" label="Custom"/>
     </option>
     <option key="input.natural_scroll" label="Natural scrolling" help="The content moves with your fingers, like a phone"
-            type="switch" default="false" target="hyprland-lua" action="hyprland-reload"/>
+            type="switch" default="false" target="hyprland-lua riley-model" action="hyprland-reload"/>
     <option key="input.follow_mouse" label="Focus follows the mouse" help="Off: click a window to work in it"
-            type="choice" default="1" target="hyprland-lua" action="hyprland-reload">
+            type="choice" default="1" target="hyprland-lua riley-model" action="hyprland-reload">
       <choice value="0" label="Off"/>
       <choice value="1" label="On"/>
       <choice value="2" label="Keyboard follows a click, the pointer moves freely"/>
@@ -173,7 +173,7 @@
   <page id="startup" title="Startup Apps" order="90" icon="system-run-symbolic">
     <section title="Start with Hyprland"
              help="Your own apps, started when you log in. Changes take effect at the next login. The bar, dock, notifications and other desktop parts always start.">
-      <option key="startup.apps" label="Startup apps" type="list" target="hyprland-lua" action="none">
+      <option key="startup.apps" label="Startup apps" type="list" target="hyprland-lua riley-model" action="none">
         <field name="name" type="text" label="Name"/>
         <field name="exec" type="text" label="Command"/>
         <field name="enabled" type="switch" default="true" label="Start this app at login"/>
@@ -185,7 +185,7 @@
     <section title="When you're away"
              help="How long the computer waits with no keyboard or mouse input. Changes take effect at once.">
       <option key="power.screensaver_after" label="Start the screensaver" help="Text effects on every screen; any key or a click ends it"
-              type="choice" default="0" target="hypridle" action="hypridle-restart">
+              type="choice" default="0" target="hypridle riley-model" action="hypridle-restart">
         <choice value="0" label="Never"/>
         <choice value="60" label="After 1 minute"/>
         <choice value="120" label="After 2 minutes"/>
@@ -197,7 +197,7 @@
         <choice value="1800" label="After 30 minutes"/>
       </option>
       <option key="power.lock_after" label="Lock the screen" help="Your password brings it back"
-              type="choice" default="0" target="hypridle" action="hypridle-restart">
+              type="choice" default="0" target="hypridle riley-model" action="hypridle-restart">
         <choice value="0" label="Never"/>
         <choice value="300" label="After 5 minutes"/>
         <choice value="600" label="After 10 minutes"/>
@@ -209,7 +209,7 @@
         <choice value="7200" label="After 2 hours"/>
       </option>
       <option key="power.screens_off_after" label="Turn the screens off" help="Any key or mouse move turns them on"
-              type="choice" default="0" target="hypridle" action="hypridle-restart">
+              type="choice" default="0" target="hypridle riley-model" action="hypridle-restart">
         <choice value="0" label="Never"/>
         <choice value="300" label="After 5 minutes"/>
         <choice value="600" label="After 10 minutes"/>
@@ -222,7 +222,7 @@
         <choice value="7200" label="After 2 hours"/>
       </option>
       <option key="power.sleep_after" label="Sleep" help="Agents, builds and downloads pause while it sleeps; the screen locks first"
-              type="choice" default="0" target="hypridle" action="hypridle-restart">
+              type="choice" default="0" target="hypridle riley-model" action="hypridle-restart">
         <choice value="0" label="Never"/>
         <choice value="300" label="After 5 minutes"/>
         <choice value="600" label="After 10 minutes"/>
