@@ -508,7 +508,8 @@ private Q_SLOTS:
         QStringList ids;
         for (QQuickItem* e : visibleWithPrefix(QStringLiteral("page:")))
             ids.append(e->objectName().mid(5));
-        check(QStringLiteral("the menu has 11 entries"), ids.size() == 11, show(ids));
+        // 12: Riley's 10 pages, the system launcher, and the Keys page (keys brief 2026-11-13).
+        check(QStringLiteral("the menu has 12 entries"), ids.size() == 12, show(ids));
         for (const QString& id : ids)
             if (id != QLatin1String("system")) {
                 showPage(id);

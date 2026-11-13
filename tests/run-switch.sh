@@ -62,7 +62,7 @@ warnings_in() { grep -E '\.qml|qml:|QQml|TypeError|ReferenceError|Binding loop' 
 # ---- Marc's real files: their state now, compared at the end. Read only, never written. -------------------------
 REAL_CFG=${XDG_CONFIG_HOME:-$HOME/.config}
 REAL_HYPR=$HOME/.config/hypr          # where Riley's GTK panel keeps its model (core.py: Path.home() / ".config/hypr")
-REAL_FILES="$REAL_HYPR/settings.json $REAL_HYPR/settings.lua $REAL_HYPR/idle.conf $REAL_HYPR/hypridle.conf
+REAL_FILES="$REAL_HYPR/settings.json $REAL_HYPR/settings.lua $REAL_HYPR/keys-user.lua $REAL_HYPR/idle.conf $REAL_HYPR/hypridle.conf
     $REAL_HYPR/hyprpaper.conf $REAL_HYPR/float-mode.json $REAL_HYPR/current-theme $REAL_HYPR/current-background
     $REAL_HYPR/wallpapers.json $HOME/.config/riley/desktop.json $REAL_CFG/riley/settings.xml $REAL_CFG/riley/settings-panel
     $REAL_CFG/riley/fonts.toml $REAL_CFG/riley/weather.toml $REAL_CFG/riley/greeter-sway.conf
@@ -105,11 +105,11 @@ declare -A SUM=(
     [expected/expected-m3.lua]=809f90340d13a2f6c6e548412ce2e2cc38812421f16cb3efa1b488802e61520c
     [expected/expected-m4.lua]=4a8973fb45b8f7abca6551a440f3ad60fa91781ed4d4f61dc71abe5366a54364
     [expected/expected-m7-idle.conf]=1fa3768be7bb83ffe7cab5eec6670bbbb6e9b08f9859fdd116c314b2eee397b4
-    [switch/expected/check-install.txt]=b5e57b5bc346631bc08541cf37960a3454a3053869260ea845aae60ab84376fe
-    [switch/expected/check-m1.txt]=2f786031567493f87dc8e014cf77ca593e3aaabcd16da3ee09bf753160fa65c4
-    [switch/expected/check-m3.txt]=da8ecf205e3e32dfa86a935aa8cd75e6b793aca64de19b9414d47e372f46edc6
-    [switch/expected/check-m4.txt]=0166bbb178704c6ef7e57050a9ee72bff1934cbd4aee9e2c76298bd4cb812a00
-    [switch/expected/check-real.txt]=f6abe06140954185656ca0ebe2ad9c469bb2a8d320c8a8f23e59bbba16373bd5
+    [switch/expected/check-install.txt]=95c7ea66f74973746bfc80babae0d2600c10cf317e61d14ffc166fe8a3a24579
+    [switch/expected/check-m1.txt]=353db2f50ee4d3976c3df17abd07e03efcbccc60c3309f5c597e1ea698ad47cc
+    [switch/expected/check-m3.txt]=3a5147dc3d72448b4a8964b5564509027b5a745cd72b4cc1640719fc1023253c
+    [switch/expected/check-m4.txt]=08d46e892aa041f92cf6df44f3f785441863f416684571659e195a66bd4f1817
+    [switch/expected/check-real.txt]=f3af75a73c9222f85841793d2eb60b8679066ffaaf6cc0085266e687e5cccfd1
     [switch/expected/import-m1.values.xml]=a033389707bc0b45a14afefe39504975e3d2f8138d7af86e908e0388fcbb4181
     [switch/expected/import-m3.values.xml]=f4c8fbccd3b450f22badd8460dd642b6e30c424b0c9dff743046648b3b1f2a12
     [switch/expected/import-m4.values.xml]=ef2263eb2a33b1dcc790ec74f4ce43ef9f87279f1333fa4029d414dcdb23f067
@@ -323,6 +323,7 @@ fi
 # ---- import-real: Marc's live GTK model and the files its pages read, copied (read only) into a throwaway home ------
 H=$RUN/real/home
 REAL_SOURCES="$REAL_HYPR/settings.json:.config/hypr/settings.json $REAL_HYPR/settings.lua:.config/hypr/settings.lua
+    $REAL_HYPR/keys-user.lua:.config/hypr/keys-user.lua
     $REAL_HYPR/idle.conf:.config/hypr/idle.conf $REAL_HYPR/hypridle.conf:.config/hypr/hypridle.conf
     $REAL_HYPR/hyprpaper.conf:.config/hypr/hyprpaper.conf $REAL_HYPR/float-mode.json:.config/hypr/float-mode.json
     $REAL_HYPR/current-theme:.config/hypr/current-theme $REAL_HYPR/current-background:.config/hypr/current-background
