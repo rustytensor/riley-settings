@@ -1,0 +1,67 @@
+#include "panel.h"
+
+#include "models.h"
+
+#include <QDir>
+#include <QQuickWindow>
+#include <QtQml/qqmlextensionplugin.h>
+
+#ifndef RILEY_SETTINGS_SHARE_DIR
+#error "RILEY_SETTINGS_SHARE_DIR must be defined by the build"
+#endif
+
+// The QML module is a static plugin: bring it in here, so a program that links the library needs nothing else.
+Q_IMPORT_QML_PLUGIN(Riley_SettingsPlugin)
+
+namespace riley::panel {
+namespace {
+
+QString envOr(const char* name, const QString& fallback)
+{
+    const QString v = qEnvironmentVariable(name);
+    return v.isEmpty() ? fallback : v;
+}
+
+}  // namespace
+
+bool load(QQmlApplicationEngine& engine, const LoadOptions& options, QString* error)
+{
+    const QString share = envOr("RILEY_SETTINGS_SHARE", QStringLiteral(RILEY_SETTINGS_SHARE_DIR));
+    const QString configHome = envOr("XDG_CONFIG_HOME", QDir::homePath() + QStringLiteral("/.config"));
+
+    Paths paths;
+    paths.description = options.descriptionPath.isEmpty() ? share + QStringLiteral("/settings.xml")
+                                                          : options.descriptionPath;
+    paths.schemaDir = share + QStringLiteral("/schema");
+    paths.values = options.valuesPath.isEmpty() ? configHome + QStringLiteral("/riley/settings.xml")
+                                                : options.valuesPath;
+    paths.configHome = configHome;
+    paths.actionLog = qEnvironmentVariable("RILEY_SETTINGS_ACTION_LOG");
+
+    QString why;
+    Controller* controller = Controller::create(paths, options.applyActions, &why);
+    if (!controller) {
+        *error = why;
+        return false;
+    }
+    controller->setParent(&engine);
+
+    QList<QQmlError> warnings;
+    const auto onWarnings = QObject::connect(&engine, &QQmlEngine::warnings,
+                                             [&warnings](const QList<QQmlError>& w) { warnings += w; });
+    engine.setInitialProperties({{QStringLiteral("panel"), QVariant::fromValue(static_cast<QObject*>(controller))}});
+    engine.loadFromModule("Riley.Settings", "Main");
+    QObject::disconnect(onWarnings);
+
+    if (engine.rootObjects().isEmpty()) {
+        *error = warnings.isEmpty() ? QStringLiteral("Main.qml did not load") : warnings.first().toString();
+        return false;
+    }
+    if (!qobject_cast<QQuickWindow*>(engine.rootObjects().constFirst())) {
+        *error = QStringLiteral("Main.qml's root object is not a window");
+        return false;
+    }
+    return true;
+}
+
+}  // namespace riley::panel

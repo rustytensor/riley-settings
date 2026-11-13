@@ -64,4 +64,34 @@ QByteArray editValueText(const QByteArray& data, const QString& key, const QStri
 // Escape text for XML character data.
 QByteArray escapeText(const QString& text);
 
+// --- The panel's save path: the set path above, plus a new file, a removed key and a list. ---
+
+// What a values file holds before any value: the XML declaration, one comment, an empty <settings>.
+QByteArray newValuesFileText();
+
+// One list item to store: field name -> text. Fields the option does not have are ignored.
+using ItemFields = QHash<QString, QString>;
+
+// Remove the element of `key` (and its whole lines when it stands alone on them). Data unchanged when not set.
+QByteArray removeValueElement(const QByteArray& data, const QString& key, QString* error);
+
+// Set a list value: every field of every item in the option's field order, a missing field taking its default.
+// An existing element of the key is replaced from its start tag to its end tag; a new one goes where setValue puts
+// a new key.
+QByteArray editListValue(const QByteArray& data, const Option& option, const QList<ItemFields>& items,
+                         QString* error);
+
+// Whether `text` is the option's default (numbers compared as numbers).
+bool isDefaultText(const Option& option, const QString& text);
+
+// Store one scalar value in the values file `path`, as the panel does on a change: a value equal to the default
+// removes the key; otherwise the key is set (the file is created first, as newValuesFileText(), when missing).
+// The file is changed atomically, or not at all. False with a one-line *error (nothing changed) on a refused value.
+bool storeValue(const QString& path, const Description& description, const QString& schemaDir, const QString& key,
+                const QString& text, QString* error);
+
+// The same for a list: an empty list is the default and removes the key.
+bool storeList(const QString& path, const Description& description, const QString& schemaDir, const QString& key,
+               const QList<ItemFields>& items, QString* error);
+
 }  // namespace riley::config

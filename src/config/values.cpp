@@ -5,6 +5,8 @@
 
 #include <QFile>
 
+#include <functional>
+
 #include <libxml/tree.h>
 
 namespace riley::config {
@@ -424,6 +426,340 @@ bool setValue(const QString& path, const Description& description, const QString
         *error = path + QStringLiteral(": the edit of ") + key + QStringLiteral(" did not hold; file left unchanged");
         return false;
     }
+    return writeFileAtomic(path, after, error);
+}
+
+
+// ---- The panel's save path ------------------------------------------------------------------------------------
+
+namespace {
+
+QByteArray escapeAttr(const QString& text)
+{
+    return escapeText(text).replace('"', "&quot;");
+}
+
+// Where things are in a values file: the element of one key, and what a new element needs.
+struct Layout {
+    qsizetype start = -1;            // the key's element: first byte of its start tag
+    qsizetype end = -1;              // one past the last byte of its end tag (or of a self-closing start tag)
+    qsizetype lastValue = -1;        // index of the last <value> start tag at depth 1
+    qsizetype rootEnd = -1;          // index of the root's end tag token
+    qsizetype rootSelfClosing = -1;  // index of a self-closing root start tag
+};
+
+bool findLayout(const std::vector<Token>& tokens, const QString& key, Layout* l, QString* error)
+{
+    int depth = 0;
+    for (size_t i = 0; i < tokens.size(); ++i) {
+        const Token& t = tokens[i];
+        if (t.kind == Kind::EndTag) {
+            --depth;
+            if (depth == 0)
+                l->rootEnd = qsizetype(i);
+            continue;
+        }
+        if (t.kind != Kind::StartTag)
+            continue;
+        if (depth == 0 && t.selfClosing)
+            l->rootSelfClosing = qsizetype(i);
+        if (depth == 1 && t.name == "value") {
+            l->lastValue = qsizetype(i);
+            if (t.hasKey && t.key == key) {
+                l->start = t.start;
+                if (t.selfClosing) {
+                    l->end = t.end;
+                } else {
+                    int d = 0;
+                    size_t j = i + 1;
+                    for (; j < tokens.size(); ++j) {
+                        const Token& u = tokens[j];
+                        if (u.kind == Kind::EndTag) {
+                            if (d == 0)
+                                break;
+                            --d;
+                        } else if (u.kind == Kind::StartTag && !u.selfClosing) {
+                            ++d;
+                        }
+                    }
+                    if (j == tokens.size()) {
+                        *error = QStringLiteral("the value of ") + key + QStringLiteral(" does not end");
+                        return false;
+                    }
+                    l->end = tokens[j].end;
+                }
+            }
+        }
+        if (!t.selfClosing)
+            ++depth;
+    }
+    return true;
+}
+
+QByteArray newlineOf(const QByteArray& data)
+{
+    return data.contains("\r\n") ? QByteArray("\r\n") : QByteArray("\n");
+}
+
+// The white space before `at` on its line, when only white space is there; else empty with *ok false.
+QByteArray indentBefore(const QByteArray& data, qsizetype at, bool* ok)
+{
+    const qsizetype ls = data.lastIndexOf('\n', at - 1) + 1;
+    *ok = allSpace(data, ls, at);
+    return *ok ? data.mid(ls, at - ls) : QByteArray();
+}
+
+// A new element where setValue puts a new key: on a new line before </settings>, indented like the last value.
+QByteArray insertElement(const QByteArray& data, const std::vector<Token>& tokens, const Layout& l,
+                         const std::function<QByteArray(const QByteArray&)>& element, QString* error)
+{
+    const QByteArray newline = newlineOf(data);
+    QByteArray indent = "  ";
+    if (l.lastValue >= 0) {
+        bool ok = false;
+        const QByteArray in = indentBefore(data, tokens[size_t(l.lastValue)].start, &ok);
+        if (ok)
+            indent = in;
+    }
+    if (l.rootSelfClosing >= 0) {
+        const Token& t = tokens[size_t(l.rootSelfClosing)];
+        const qsizetype slash = data.lastIndexOf('/', t.end - 1);
+        return data.left(slash) + '>' + newline + indent + element(indent) + newline + "</" + t.name + '>'
+            + data.mid(t.end);
+    }
+    if (l.rootEnd < 0) {
+        *error = QStringLiteral("the file has no </settings>");
+        return {};
+    }
+    const qsizetype at = tokens[size_t(l.rootEnd)].start;
+    const qsizetype ls = data.lastIndexOf('\n', at - 1) + 1;
+    if (ls > 0 && allSpace(data, ls, at))
+        return data.left(ls) + indent + element(indent) + newline + data.mid(ls);
+    return data.left(at) + element(indent) + data.mid(at);
+}
+
+bool readFile(const QString& path, QByteArray* out, QString* error)
+{
+    QFile f(path);
+    if (!f.open(QIODevice::ReadOnly)) {
+        *error = path + QStringLiteral(": ") + f.errorString();
+        return false;
+    }
+    *out = f.readAll();
+    return true;
+}
+
+// The values file as it is now, or the text of a new one when there is none (*exists says which).
+bool currentText(const QString& path, const QString& schemaDir, QByteArray* out, bool* exists, QString* error)
+{
+    *exists = QFile::exists(path);
+    if (!*exists) {
+        *out = newValuesFileText();
+        return true;
+    }
+    if (!readFile(path, out, error))
+        return false;
+    return Values::parse(*out, path, schemaDir, error) != nullptr;
+}
+
+bool removeKey(const QString& path, const QString& schemaDir, const QString& key, QString* error)
+{
+    if (!QFile::exists(path))
+        return true;   // removing a key that is not set changes nothing
+    QByteArray before;
+    bool exists = false;
+    if (!currentText(path, schemaDir, &before, &exists, error))
+        return false;
+    QString scanError;
+    const QByteArray after = removeValueElement(before, key, &scanError);
+    if (!scanError.isEmpty()) {
+        *error = path + QStringLiteral(": ") + scanError;
+        return false;
+    }
+    if (after == before)
+        return true;
+    const auto check = Values::parse(after, path, schemaDir, error);
+    if (!check)
+        return false;
+    if (check->value(key)) {
+        *error = path + QStringLiteral(": the removal of ") + key + QStringLiteral(" did not hold; file left unchanged");
+        return false;
+    }
+    return writeFileAtomic(path, after, error);
+}
+
+}  // namespace
+
+QByteArray newValuesFileText()
+{
+    return QByteArray("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                      "<!-- Riley settings: only what differs from the defaults. -->\n"
+                      "<settings version=\"1\">\n"
+                      "</settings>\n");
+}
+
+QByteArray removeValueElement(const QByteArray& data, const QString& key, QString* error)
+{
+    std::vector<Token> tokens;
+    if (!scan(data, &tokens, error))
+        return data;
+    Layout l;
+    if (!findLayout(tokens, key, &l, error))
+        return data;
+    if (l.start < 0)
+        return data;
+    // Alone on its lines: the whole lines go, newline included.
+    const qsizetype ls = data.lastIndexOf('\n', l.start - 1) + 1;
+    qsizetype le = data.indexOf('\n', l.end);
+    const bool lastLine = le < 0;
+    if (lastLine)
+        le = data.size();
+    if (allSpace(data, ls, l.start) && allSpace(data, l.end, le))
+        return data.left(ls) + data.mid(lastLine ? le : le + 1);
+    return data.left(l.start) + data.mid(l.end);
+}
+
+QByteArray editListValue(const QByteArray& data, const Option& option, const QList<ItemFields>& items,
+                         QString* error)
+{
+    std::vector<Token> tokens;
+    if (!scan(data, &tokens, error))
+        return {};
+    Layout l;
+    if (!findLayout(tokens, option.key, &l, error))
+        return {};
+    const QByteArray newline = newlineOf(data);
+    const auto element = [&](const QByteArray& indent) {
+        QByteArray e = "<value key=\"" + escapeAttr(option.key) + "\">" + newline;
+        for (const ItemFields& item : items) {
+            e += indent + "  <item";
+            for (const Field& f : option.fields) {
+                const QString v = item.contains(f.name) ? item.value(f.name) : f.defaultValue.value_or(QString());
+                e += ' ' + f.name.toUtf8() + "=\"" + escapeAttr(v) + '"';
+            }
+            e += "/>" + newline;
+        }
+        return e + indent + "</value>";
+    };
+    if (l.start < 0)
+        return insertElement(data, tokens, l, element, error);
+    bool ok = false;
+    QByteArray indent = indentBefore(data, l.start, &ok);
+    if (!ok)
+        indent = "  ";
+    return data.left(l.start) + element(indent) + data.mid(l.end);
+}
+
+bool isDefaultText(const Option& option, const QString& text)
+{
+    const QString def = option.defaultValue.value_or(QString());
+    switch (option.type) {
+    case OptionType::List:
+        return false;
+    case OptionType::Slider:
+    case OptionType::Number: {
+        double a = 0, b = 0;
+        return parseNumber(text.trimmed(), &a) && parseNumber(def.trimmed(), &b) && a == b;
+    }
+    case OptionType::Colour:
+        return text.trimmed().compare(def.trimmed(), Qt::CaseInsensitive) == 0;
+    case OptionType::Switch:
+    case OptionType::Choice:
+        return text.trimmed() == def.trimmed();
+    default:
+        return text == def;
+    }
+}
+
+bool storeValue(const QString& path, const Description& description, const QString& schemaDir, const QString& key,
+                const QString& text, QString* error)
+{
+    const Option* o = description.option(key);
+    if (!o) {
+        *error = QStringLiteral("unknown key: ") + key;
+        return false;
+    }
+    if (o->type == OptionType::List) {
+        *error = key + QStringLiteral(" is a list");
+        return false;
+    }
+    const QString why = checkScalar(*o, text);
+    if (!why.isEmpty()) {
+        *error = key + QStringLiteral(": \"") + text + QStringLiteral("\" ") + why;
+        return false;
+    }
+    if (isDefaultText(*o, text))
+        return removeKey(path, schemaDir, key, error);
+
+    QByteArray before;
+    bool exists = false;
+    if (!currentText(path, schemaDir, &before, &exists, error))
+        return false;
+    QString scanError;
+    const QByteArray after = editValueText(before, key, text, &scanError);   // M1's set, on the bytes
+    if (after.isEmpty()) {
+        *error = path + QStringLiteral(": ") + scanError;
+        return false;
+    }
+    const auto check = Values::parse(after, path, schemaDir, error);
+    if (!check)
+        return false;
+    const Value* v = check->value(key);
+    if (!v || v->text != text || !v->items.isEmpty()) {
+        *error = path + QStringLiteral(": the edit of ") + key + QStringLiteral(" did not hold; file left unchanged");
+        return false;
+    }
+    if (after == before && exists)
+        return true;
+    return writeFileAtomic(path, after, error);
+}
+
+bool storeList(const QString& path, const Description& description, const QString& schemaDir, const QString& key,
+               const QList<ItemFields>& items, QString* error)
+{
+    const Option* o = description.option(key);
+    if (!o) {
+        *error = QStringLiteral("unknown key: ") + key;
+        return false;
+    }
+    if (o->type != OptionType::List) {
+        *error = key + QStringLiteral(" is not a list");
+        return false;
+    }
+    for (qsizetype i = 0; i < items.size(); ++i) {
+        for (const Field& f : o->fields) {
+            const QString v = items[i].contains(f.name) ? items[i].value(f.name) : f.defaultValue.value_or(QString());
+            const QString why = checkScalar(f, v);
+            if (!why.isEmpty()) {
+                *error = key + QStringLiteral(" item %1 ").arg(i + 1) + f.name + QStringLiteral(": \"") + v
+                    + QStringLiteral("\" ") + why;
+                return false;
+            }
+        }
+    }
+    if (items.isEmpty())
+        return removeKey(path, schemaDir, key, error);
+
+    QByteArray before;
+    bool exists = false;
+    if (!currentText(path, schemaDir, &before, &exists, error))
+        return false;
+    QString scanError;
+    const QByteArray after = editListValue(before, *o, items, &scanError);
+    if (after.isEmpty()) {
+        *error = path + QStringLiteral(": ") + scanError;
+        return false;
+    }
+    const auto check = Values::parse(after, path, schemaDir, error);
+    if (!check)
+        return false;
+    const Value* v = check->value(key);
+    if (!v || v->items.size() != items.size()) {
+        *error = path + QStringLiteral(": the edit of ") + key + QStringLiteral(" did not hold; file left unchanged");
+        return false;
+    }
+    if (after == before && exists)
+        return true;
     return writeFileAtomic(path, after, error);
 }
 

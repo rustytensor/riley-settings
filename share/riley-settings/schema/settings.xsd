@@ -79,6 +79,8 @@
       <xs:enumeration value="dock-reload"/>
       <xs:enumeration value="bar-reload"/>
       <xs:enumeration value="greeter-sync"/>
+      <xs:enumeration value="theme-fonts"/>
+      <xs:enumeration value="desktop-reload"/>
       <xs:enumeration value="none"/>
     </xs:restriction>
   </xs:simpleType>

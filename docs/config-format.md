@@ -52,7 +52,9 @@ Three kinds of file, all XML. The first two are checked against an XML schema (X
   - `field` children (`name`, `type`, `label`, optional `default`): for `list`; the columns of one item.
   - `target`: the writers fed by this option, space-separated (table below).
   - `action`: what runs after a change, space-separated, from this closed list: `hyprland-reload`,
-    `hypridle-restart`, `hyprpaper-reload`, `dock-reload`, `bar-reload`, `greeter-sync`, `none`. Never a shell line.
+    `hypridle-restart`, `hyprpaper-reload`, `dock-reload`, `bar-reload`, `greeter-sync`, `theme-fonts` (the
+    theme's fonts and your font choices, applied again), `desktop-reload` (the desktop boxes, restarted), `none`.
+    Never a shell line.
 
 What XSD checks: element structure, the type list, required `key`, unique `key` (`xs:unique`), the action list,
 integer `order`. What the loader checks after XSD: a default within `min`..`max`, a choice default among its

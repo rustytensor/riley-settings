@@ -65,11 +65,11 @@
     </section>
     <section title="Fonts" help="Your choices override the theme. Other theme settings and wallpapers stay as they are.">
       <option key="fonts.sans" label="Interface font" help="Empty: the theme's own font"
-              type="font" default="" target="fonts" action="none"/>
+              type="font" default="" target="fonts" action="theme-fonts"/>
       <option key="fonts.mono" label="Monospace font" help="Empty: the theme's own font"
-              type="font" default="" target="fonts" action="none"/>
+              type="font" default="" target="fonts" action="theme-fonts"/>
       <option key="fonts.terminal_size" label="Terminal size" help="Points"
-              type="slider" default="11" min="6" max="48" step="1" target="fonts" action="none"/>
+              type="slider" default="11" min="6" max="48" step="1" target="fonts" action="theme-fonts"/>
     </section>
     <section title="Weather" help="Empty location uses your public IP to guess the place. The bar refreshes every 15 minutes.">
       <option key="weather.location" label="Location" type="text" default="" target="weather" action="none"/>
@@ -117,7 +117,7 @@
         help="Drag a picture onto a screen to use it there; click a picture to use it on every screen.">
     <option key="theme.name" label="Theme"
             help="Recolours the whole desktop: borders, bar, dock, menus, terminal, prompt, apps, and sets its wallpapers."
-            type="text" default="" target="theme" action="none"/>
+            type="text" default="" target="theme" action="theme-fonts"/>
     <option key="wallpaper.picture" label="Wallpaper" help="The picture on every screen without its own"
             type="file" default="" target="hyprpaper" action="hyprpaper-reload"/>
     <option key="wallpaper.screens" label="Wallpaper per screen" help="A picture of its own for one screen"
@@ -159,15 +159,15 @@
   <page id="desktop" title="Desktop" order="80" icon="user-desktop-symbolic" widget="desktop"
         help="~/Desktop and each folder in it get a box by themselves; Add Folder gives any other folder one. The desktop follows changes within a second.">
     <option key="desktop.show" label="Boxes on the desktop" help="Frosted boxes showing your folders"
-            type="switch" default="true" target="riley-desktop" action="none"/>
+            type="switch" default="true" target="riley-desktop" action="desktop-reload"/>
     <option key="desktop.boxes" label="Boxes" help="Move a box by its title, resize it by its corner; right-click it to send it to another screen."
-            type="list" target="riley-desktop" action="none">
+            type="list" target="riley-desktop" action="desktop-reload">
       <field name="folder" type="folder" label="Folder"/>
       <field name="screen" type="text" label="Screen"/>
       <field name="hidden" type="switch" default="false" label="Hidden"/>
     </option>
     <option key="desktop.icon_size" label="Icon size" type="slider" default="48" min="32" max="96" step="8"
-            target="riley-desktop" action="none"/>
+            target="riley-desktop" action="desktop-reload"/>
   </page>
 
   <page id="startup" title="Startup Apps" order="90" icon="system-run-symbolic">
