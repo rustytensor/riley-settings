@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Seed for the M4 gate's layout group: Riley fixture-m1's screens, a German layout and one option of your own. -->
+<settings version="1">
+  <value key="display.monitors">
+    <item desc="Dell Inc. DELL U2515H YKFWP4CC09VL" enabled="true" mode="2560x1440@59.95" x="0" y="0" scale="1" transform="3"/>
+    <item desc="Samsung Electric Company S34C65xU HCNYB00237" enabled="true" mode="3440x1440@59.97" x="1440" y="407" scale="1" transform="0"/>
+    <item desc="Samsung Electric Company S34C65xU HCNYB00019" enabled="true" mode="3440x1440@59.97" x="4880" y="407" scale="1" transform="0"/>
+    <item desc="GWD ARZOPA 0x37330206" enabled="true" mode="2560x1600@60.00" x="1440" y="1847" scale="1.5" transform="0"/>
+    <item desc="GWD ARZOPA 0000001504150" enabled="false" mode="2560x1600@60.00" x="4495" y="1847" scale="1.25" transform="0"/>
+  </value>
+  <value key="input.kb_layout">us,ro</value>
+  <value key="input.kb_options">caps:escape,grp:alt_shift_toggle</value>
+  <value key="input.kb_variant">,std</value>
+</settings>

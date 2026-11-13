@@ -1,0 +1,18 @@
+#!/bin/bash
+# Fake lpoptions for the M4 gate (replaces the M3 one in the run): `-p QUEUE` lists the queue's options with your own
+# (from $D/state/options-QUEUE, one "key=value" per line) put after copies=1; `-p QUEUE -o K=V` sets one of yours,
+# only for the three changes the gate plans; `-d QUEUE` makes it your default. It never writes ~/.cups/lpoptions.
+. "$(dirname "$0")/_common.sh"
+mine() { [ -e "$D/state/options-$1" ] && tr '\n' ' ' <"$D/state/options-$1"; }
+set_opt() {   # queue key=value: replace the key's line, else add one
+    local f="$D/state/options-$1" k=${2%%=*}
+    touch "$f"
+    grep -v "^$k=" "$f" >"$f.new"; echo "$2" >>"$f.new"; mv "$f.new" "$f"
+}
+case "$*" in
+    "-p Office"|"-p RileyGate") sed "s/^copies=1 /copies=1 $(mine "$2")/" "$D/canned/lpoptions-p-$2.txt" ;;
+    "-p Office -o media=na_letter_8.5x11in"|"-p Office -o print-quality=5"|"-p RileyGate -o sides=two-sided-long-edge")
+        set_opt "$2" "$4" ;;
+    "-d RileyGate"|"-d Office") echo "$2" >"$D/state/default" ;;
+    *) unexpected "$@" ;;
+esac

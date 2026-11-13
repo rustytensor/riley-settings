@@ -1,0 +1,7 @@
+hyprland-lua	same	@HOME@/.config/hypr/settings.lua
+riley-model	same	@HOME@/.config/hypr/settings.json
+hyprpaper	same	@HOME@/.config/hypr/hyprpaper.conf
+riley-dock	same	@HOME@/.cache/nwg-dock-pinned
+riley-dock	same	@HOME@/.config/nwg-dock-hyprland/riley.conf
+riley-desktop	same	@HOME@/.config/riley/desktop.json
+hypridle	same	@HOME@/.config/hypr/idle.conf

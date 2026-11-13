@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Riley settings: only what differs from the defaults. -->
+<settings version="1">
+  <value key="display.monitors">
+    <item desc="Dell Inc. DELL U2515H YKFWP4CC09VL" enabled="true" mode="2560x1440@59.95" x="0" y="0" scale="1" transform="3"/>
+    <item desc="Samsung Electric Company S34C65xU HCNYB00237" enabled="true" mode="3440x1440@59.97" x="1440" y="407" scale="1" transform="0"/>
+    <item desc="Samsung Electric Company S34C65xU HCNYB00019" enabled="true" mode="3440x1440@59.97" x="4880" y="407" scale="1" transform="0"/>
+    <item desc="GWD ARZOPA 0x37330206" enabled="true" mode="2560x1600@60.00" x="1440" y="1847" scale="1.5" transform="0"/>
+    <item desc="GWD ARZOPA 0000001504150" enabled="false" mode="2560x1600@60.00" x="4495" y="1847" scale="1.25" transform="0"/>
+  </value>
+  <value key="wallpaper.picture">/srv/pictures/c.jpg</value>
+  <value key="startup.apps">
+    <item name="Slack" exec="flatpak run com.slack.Slack" enabled="true"/>
+    <item name="btop in a terminal" exec="ptyxis --new-window -x btop" enabled="false"/>
+    <item name="Notes" exec="gnome-text-editor &quot;/home/marcm/notes today.txt&quot;" enabled="true"/>
+  </value>
+</settings>

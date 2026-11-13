@@ -1,0 +1,16 @@
+"/usr/share/cups/ipptool/get-printer-attributes.test":
+    Get-Printer-Attributes Test                                          [PASS]
+        RECEIVED: 1630 bytes in response
+        status-code = successful-ok (successful-ok)
+        attributes-charset (charset) = utf-8
+        attributes-natural-language (naturalLanguage) = en
+        printer-name (nameWithoutLanguage) = RileyGate
+        printer-info (textWithoutLanguage) = Riley gate queue
+        media-default (keyword) = na_letter_8.5x11in
+        media-supported (1setOf keyword) = na_letter_8.5x11in,iso_a4_210x297mm
+        print-color-mode-default (keyword) = monochrome
+        print-color-mode-supported (1setOf keyword) = monochrome,color
+        print-quality-default (enum) = normal
+        print-quality-supported (enum) = normal
+        sides-default (keyword) = one-sided
+        sides-supported (1setOf keyword) = one-sided,two-sided-long-edge,two-sided-short-edge

@@ -1,0 +1,16 @@
+"/usr/share/cups/ipptool/get-printer-attributes.test":
+    Get-Printer-Attributes Test                                          [PASS]
+        RECEIVED: 2104 bytes in response
+        status-code = successful-ok (successful-ok)
+        attributes-charset (charset) = utf-8
+        attributes-natural-language (naturalLanguage) = en
+        printer-name (nameWithoutLanguage) = Office
+        printer-info (textWithoutLanguage) = Office laser
+        media-default (keyword) = iso_a4_210x297mm
+        media-supported (1setOf keyword) = iso_a4_210x297mm,na_letter_8.5x11in,iso_a5_148x210mm,custom_min_76.2x127mm,custom_max_215.9x355.6mm
+        print-color-mode-default (keyword) = color
+        print-color-mode-supported (1setOf keyword) = monochrome,color
+        print-quality-default (enum) = normal
+        print-quality-supported (1setOf enum) = draft,normal,high
+        sides-default (keyword) = one-sided
+        sides-supported (keyword) = one-sided

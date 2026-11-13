@@ -1,0 +1,3 @@
+lpoptions -p Office -o media=na_letter_8.5x11in
+lpoptions -p Office -o print-quality=5
+lpoptions -p RileyGate -o sides=two-sided-long-edge

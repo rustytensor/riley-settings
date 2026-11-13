@@ -1,0 +1,9 @@
+#!/bin/bash
+# Fake ipptool for the M4 gate: Get-Printer-Attributes of a local queue, answered from tests/switch/fixtures
+# (ipptool -tv output, C locale). Every other argv is unexpected.
+. "$(dirname "$0")/_common.sh"
+case "$*" in
+    "-tv ipp://localhost/printers/Office get-printer-attributes.test") cat "$D/canned/ipptool-Office.txt" ;;
+    "-tv ipp://localhost/printers/RileyGate get-printer-attributes.test") cat "$D/canned/ipptool-RileyGate.txt" ;;
+    *) unexpected "$@" ;;
+esac
