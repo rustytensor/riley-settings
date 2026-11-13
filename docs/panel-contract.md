@@ -84,7 +84,7 @@ item or inside it.
 | `font` | `commitValue("Noto Sans 12")` | that font |
 | `file` | `commitValue("/path/to/file")` | that path |
 | `folder` | `commitValue("/path/to/folder")` | that path |
-| `keybinding` | `commitValue("SUPER+SHIFT+K")` | that binding: modifiers in the order `SUPER`, `CTRL`, `ALT`, `SHIFT`, then the key, joined by `+` |
+| `keybinding` | `commitValue("SUPER+SHIFT+K")` | that binding: modifiers in the order `SUPER`, `CTRL`, `ALT`, `SHIFT`, then the key, joined by `+`; Super pressed and released with no other key is `SUPER+SUPER_L` (or `SUPER_R`) |
 | `list` | `commitItems([{screen: "DP-1", path: "/a.png"}])` | the whole list replaced by these items |
 
 `commitValue(value)` and `commitItems(items)` are QML functions on the `option:<key>` item with an untyped

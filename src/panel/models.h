@@ -81,6 +81,9 @@ public:
     // A key press as a key binding: modifiers in the order SUPER, CTRL, ALT, SHIFT, then the key, joined by "+".
     // Empty for a key that is only a modifier.
     Q_INVOKABLE QString bindingText(int key, int modifiers) const;
+    // Super pressed and released with no other key: "SUPER+SUPER_L" or "SUPER+SUPER_R", as Hyprland names it.
+    // Empty for any other key.
+    Q_INVOKABLE QString aloneText(int key) const;
 
     // Re-read the shown value from the controller's values.
     void refresh();

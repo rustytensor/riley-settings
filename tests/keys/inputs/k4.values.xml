@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The overview key (riley 2eb4c04) moved to the right Super key alone, set before keys.agent_stop. Expected:
+     expected/k4.keys-user.lua, written by hand: description order (agent_stop, then overview), one line per key. -->
+<settings version="1">
+  <value key="keys.overview">SUPER+SUPER_R</value>
+  <value key="keys.agent_stop">SUPER+ALT+Escape</value>
+</settings>

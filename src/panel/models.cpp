@@ -599,4 +599,17 @@ QString OptionItem::bindingText(int key, int modifiers) const
     return parts.join(QLatin1Char('+'));
 }
 
+QString OptionItem::aloneText(int key) const
+{
+#ifndef RILEY_PLANT_FAULT_KEYS
+    if (key == Qt::Key_Super_L)
+        return QStringLiteral("SUPER+SUPER_L");
+    if (key == Qt::Key_Super_R)
+        return QStringLiteral("SUPER+SUPER_R");
+#else
+    Q_UNUSED(key);   // the keys gate's planted fault: Super alone is not taken
+#endif
+    return {};
+}
+
 }  // namespace riley::panel

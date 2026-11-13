@@ -12,7 +12,7 @@ option(RILEY_PLANT_FAULT_PANEL "Plant the gate's fault in the panel's bindings (
 # The M3 gate's planted faults: one per custom page (docs/pages-contract.md, "The planted faults").
 option(RILEY_PLANT_FAULT_PAGES "Plant the M3 gate's faults in the custom pages (tests only)" OFF)
 # The M4 gate's planted faults (docs/switch-contract.md, "The planted faults").
-option(RILEY_PLANT_FAULT_KEYS "Plant the keys gate's fault: hyprland-keys ignores the values file (tests only)" OFF)
+option(RILEY_PLANT_FAULT_KEYS "Plant the keys gate's faults: hyprland-keys ignores the values file, the recorder drops Super alone (tests only)" OFF)
 option(RILEY_PLANT_FAULT_SWITCH "Plant the M4 gate's faults in the import, the layout picker and the printer options (tests only)" OFF)
 
 include(GNUInstallDirs)
@@ -138,6 +138,9 @@ target_link_libraries(riley-settings-panel
 if(RILEY_PLANT_FAULT_PANEL)
     message(WARNING "RILEY_PLANT_FAULT_PANEL is ON: the second option is bound to the third option's key (gate builds only)")
     target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_PANEL)
+endif()
+if(RILEY_PLANT_FAULT_KEYS)   # and in the panel: the key recorder does not take Super pressed alone
+    target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_KEYS)
 endif()
 if(RILEY_PLANT_FAULT_PAGES)
     message(WARNING "RILEY_PLANT_FAULT_PAGES is ON: one fault per custom page (gate builds only)")

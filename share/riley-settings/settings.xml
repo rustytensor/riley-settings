@@ -113,7 +113,8 @@
   </page>
 
   <!-- The Keyboard and Mouse page is drawn by its own widget and holds no sections, so the keys get their own page.
-       Riley's hypr/keys.lua reads them from ~/.config/hypr/keys-user.lua (riley bf5b0fb). -->
+       Riley's hypr/keys.lua reads them from ~/.config/hypr/keys-user.lua (riley bf5b0fb; keys.overview since
+       riley 2eb4c04). -->
   <page id="keys" title="Keys" order="45" icon="preferences-desktop-keyboard-shortcuts-symbolic">
     <section title="Keys" help="Hyprland reloads when you change one. Empty keeps the default.">
       <option key="keys.agent_stop" label="Stop the desktop agent"
@@ -121,6 +122,8 @@
               type="keybinding" default="SUPER+SHIFT+Escape" target="hyprland-keys" action="hyprland-reload"/>
       <option key="keys.sleep" label="Sleep" help="The screen locks first."
               type="keybinding" default="SUPER+CTRL+Escape" target="hyprland-keys" action="hyprland-reload"/>
+      <option key="keys.overview" label="Activities overview" help="Opens the overview. Super pressed alone by default."
+              type="keybinding" default="SUPER+SUPER_L" target="hyprland-keys" action="hyprland-reload"/>
     </section>
   </page>
 
