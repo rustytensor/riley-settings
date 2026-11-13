@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Riley settings: only what differs from the defaults. -->
+<settings version="1">
+  <value key="test.switch">true</value>
+  <value key="power.lock_after">300</value>
+  <value key="test.slider">6</value>
+  <value key="test.number">42.25</value>
+  <value key="test.text">a &amp; b</value>
+  <value key="test.colour">#1a2b3c</value>
+</settings>

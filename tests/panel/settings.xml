@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The M2 gate's test description (tests/run-panel.sh). One option of each of the 11 types on two pages of
+     drawn sections, plus one widget page. Every target here has a writer: hypridle and hyprpaper, which need the
+     keys power.* and display.monitors, wallpaper.* (they are on the widget page when no step changes them).
+     Each driven option runs a different action or set of actions, so the action log shows which option ran.
+     The order of the options in this file is "description order" (docs/panel-contract.md). -->
+<description version="1">
+
+  <page id="basic" title="Basic" order="10" help="Switches, choices, numbers and text.">
+    <section title="Switches and choices">
+      <option key="test.switch" label="A switch" help="Off by default" type="switch" default="false"
+              target="hypridle" action="hyprland-reload"/>
+      <option key="power.lock_after" label="Lock the screen" type="choice" default="0"
+              target="hypridle" action="hypridle-restart">
+        <choice value="0" label="Never"/>
+        <choice value="300" label="After 5 minutes"/>
+        <choice value="600" label="After 10 minutes"/>
+      </option>
+    </section>
+    <section title="Numbers and text">
+      <option key="test.slider" label="A slider" type="slider" default="5" min="0" max="10" step="1"
+              target="hypridle" action="hyprpaper-reload"/>
+      <option key="test.number" label="A number" type="number" default="1.5" min="0" max="100" step="0.25"
+              target="hyprpaper" action="dock-reload"/>
+      <option key="test.text" label="Some text" type="text" default="hello" target="hyprpaper" action="bar-reload"/>
+    </section>
+  </page>
+
+  <page id="looks" title="Looks" order="20">
+    <section title="Colours and fonts">
+      <option key="test.colour" label="A colour" type="colour" default="#336699" target="hypridle" action="theme-fonts"/>
+      <option key="test.font" label="A font" type="font" default="Sans 11" target="hyprpaper" action="desktop-reload"/>
+    </section>
+    <section title="Files and keys">
+      <option key="wallpaper.picture" label="Wallpaper" help="The picture on every screen without its own"
+              type="file" default="/usr/share/backgrounds/riley/default.png" target="hyprpaper" action="greeter-sync"/>
+      <option key="test.folder" label="A folder" type="folder" default="/srv/test/default"
+              target="hypridle" action="hyprland-reload dock-reload"/>
+      <option key="test.keybinding" label="A key binding" type="keybinding" default="SUPER+K"
+              target="hyprpaper" action="hypridle-restart bar-reload"/>
+      <option key="wallpaper.screens" label="Wallpaper per screen" type="list"
+              target="hyprpaper" action="hyprpaper-reload theme-fonts">
+        <field name="screen" type="text" label="Screen"/>
+        <field name="path" type="file" label="Picture"/>
+      </option>
+    </section>
+  </page>
+
+  <page id="custom" title="Custom" order="30" widget="displays" help="Drawn by its own component (M3); a placeholder in M2.">
+    <option key="display.monitors" label="Screens" type="list" target="hyprpaper" action="greeter-sync desktop-reload">
+      <field name="desc" type="text" label="Screen"/>
+      <field name="enabled" type="switch" default="true" label="Use this screen"/>
+    </option>
+    <option key="power.screensaver_after" label="Start the screensaver" type="choice" default="0"
+            target="hypridle" action="hypridle-restart">
+      <choice value="0" label="Never"/>
+      <choice value="60" label="After 1 minute"/>
+    </option>
+    <option key="power.screens_off_after" label="Turn the screens off" type="choice" default="0"
+            target="hypridle" action="hypridle-restart">
+      <choice value="0" label="Never"/>
+      <choice value="600" label="After 10 minutes"/>
+    </option>
+    <option key="power.sleep_after" label="Sleep" type="choice" default="0" target="hypridle" action="hypridle-restart">
+      <choice value="0" label="Never"/>
+      <choice value="900" label="After 15 minutes"/>
+    </option>
+  </page>
+</description>
