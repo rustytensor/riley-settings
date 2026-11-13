@@ -1,12 +1,8 @@
-// The system launcher: the menu entry of the system-launcher page launches hypr-settings and leaves the page shown as it was (docs/pages-contract.md, "The system launcher").
-// M3 scaffolding: a stub. Every function refuses with "<page title>: not ready".
+// The system launcher: the menu entry of the system-launcher page launches hypr-settings and leaves the page shown as
+// it was (docs/pages-contract.md, "The system launcher"; Riley's app.py).
 #pragma once
 
 #include "common.h"
-
-#include <QString>
-#include <QStringList>
-#include <QVariantList>
 
 namespace riley::panel::pages {
 
@@ -17,11 +13,13 @@ class SystemLauncher : public PageBackend {
 public:
     explicit SystemLauncher(QObject* parent = nullptr) : PageBackend(parent) {}
 
+    bool ready() const override { return true; }
+
+    // Records `launch hypr-settings` (run only with --apply-actions). False when the panel is not set.
     Q_INVOKABLE bool launch();
 
 Q_SIGNALS:
     void changed();
-
 };
 
 }  // namespace riley::panel::pages
