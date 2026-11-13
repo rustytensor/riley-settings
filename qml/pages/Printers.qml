@@ -29,6 +29,10 @@ Item {
     function userOption(queue, option) { return backend.userOption(queue, option) }
     function setDefault(queue) { return backend.setDefault(queue) }
     function openSetupTool() { return backend.openSetupTool() }
+    function optionNames(queue) { return backend.optionNames(queue) }
+    function optionChoices(queue, option) { return backend.optionChoices(queue, option) }
+    function optionLabels(queue, option) { return backend.optionLabels(queue, option) }
+    function optionValue(queue, option) { return backend.optionValue(queue, option) }
 
     // Read when the page is shown, then every 3 s while it stays shown (Riley's REFRESH_SECONDS).
     onVisibleChanged: if (visible) refresh()
@@ -142,22 +146,33 @@ Item {
                                   + (card.accepting ? "" : qsTr(" (not accepting jobs)"))
                         }
 
-                        RowLayout {
-                            Layout.fillWidth: true
+                        // Riley's option rows: paper size, colour, quality, two-sided, each when the printer offers
+                        // more than one choice; the one shown is yours, else the printer's default.
+                        Repeater {
+                            model: card.modelData.options
 
-                            Label {
+                            delegate: RowLayout {
+                                id: optionRow
+
+                                required property var modelData
+
                                 Layout.fillWidth: true
-                                text: qsTr("Colour")
-                            }
 
-                            ComboBox {
-                                id: colour
-                                readonly property var values: ["color", "monochrome"]
-                                model: [qsTr("Colour"), qsTr("Black and white")]
-                                currentIndex: card.modelData.colour === "monochrome" ? 1 : 0
-                                onActivated: index => {
-                                    root.setOption(card.queue, "print-color-mode", values[index])
-                                    currentIndex = Qt.binding(() => card.modelData.colour === "monochrome" ? 1 : 0)
+                                Label {
+                                    Layout.fillWidth: true
+                                    text: optionRow.modelData.title
+                                }
+
+                                ComboBox {
+                                    objectName: "printer-option:" + card.queue + ":" + optionRow.modelData.name
+                                    property string option: optionRow.modelData.name
+                                    property string value: optionRow.modelData.value
+                                    model: optionRow.modelData.labels
+                                    currentIndex: Math.max(0, optionRow.modelData.choices.indexOf(optionRow.modelData.value))
+                                    onActivated: index => {
+                                        root.setOption(card.queue, optionRow.modelData.name, optionRow.modelData.choices[index])
+                                        currentIndex = Qt.binding(() => Math.max(0, optionRow.modelData.choices.indexOf(optionRow.modelData.value)))
+                                    }
                                 }
                             }
                         }

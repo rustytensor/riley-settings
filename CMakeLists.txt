@@ -11,6 +11,8 @@ option(RILEY_PLANT_FAULT "Plant the gate's fault in the writers' output (tests o
 option(RILEY_PLANT_FAULT_PANEL "Plant the gate's fault in the panel's bindings (tests only)" OFF)
 # The M3 gate's planted faults: one per custom page (docs/pages-contract.md, "The planted faults").
 option(RILEY_PLANT_FAULT_PAGES "Plant the M3 gate's faults in the custom pages (tests only)" OFF)
+# The M4 gate's planted faults (docs/switch-contract.md, "The planted faults").
+option(RILEY_PLANT_FAULT_SWITCH "Plant the M4 gate's faults in the import, the layout picker and the printer options (tests only)" OFF)
 
 include(GNUInstallDirs)
 find_package(Qt6 6.11 REQUIRED COMPONENTS Core Gui Qml Quick QuickControls2)
@@ -134,6 +136,13 @@ if(RILEY_PLANT_FAULT_PAGES)
                  TARGET_DIRECTORY riley-settings-panel APPEND PROPERTY COMPILE_DEFINITIONS RILEY_PLANT_FAULT_PAGES)
     set_property(SOURCE ${RILEY_PAGES_WRITER_SOURCES}
                  TARGET_DIRECTORY riley-config-core APPEND PROPERTY COMPILE_DEFINITIONS RILEY_PLANT_FAULT_PAGES)
+endif()
+
+if(RILEY_PLANT_FAULT_SWITCH)
+    message(WARNING "RILEY_PLANT_FAULT_SWITCH is ON: the M4 gate's faults are planted (gate builds only)")
+    # The layout picker's and the printer options' faults live in their page sources.
+    set_property(SOURCE src/panel/pages/keyboardmouse.cpp src/panel/pages/printers.cpp
+                 TARGET_DIRECTORY riley-settings-panel APPEND PROPERTY COMPILE_DEFINITIONS RILEY_PLANT_FAULT_SWITCH)
 endif()
 
 qt_add_executable(riley-settings-qt src/app/main.cpp)

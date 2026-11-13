@@ -167,7 +167,155 @@ QString requestId(const QByteArray& text)
     return m.hasMatch() ? m.captured(1) : QString();
 }
 
+QHash<QString, IppAttribute> parseIppAttributes(const QByteArray& text)
+{
+    static const QRegularExpression re(QStringLiteral("^\\s+([A-Za-z0-9._-]+) \\(([^)]*)\\) = (.*)$"));
+    QHash<QString, IppAttribute> out;
+    for (const QString& l : lines(text)) {
+        const auto m = re.match(l);
+        if (!m.hasMatch())
+            continue;
+        IppAttribute a;
+        a.type = m.captured(2);
+        a.values = m.captured(3).split(QLatin1Char(','));
+        out.insert(m.captured(1), a);
+    }
+    return out;
+}
+
 }  // namespace cups
+
+namespace {
+
+// Riley's printers_core.py OPTIONS, in its order, with their titles.
+struct PrinterOption {
+    const char* name;
+    const char* title;
+};
+constexpr PrinterOption OPTIONS[] = {
+    {"media", "Paper size"},
+    {"print-color-mode", "Colour"},
+    {"print-quality", "Quality"},
+    {"sides", "Two-sided"},
+};
+
+// Riley's NICE: the names of the values the page shows; any other value is shown as it is.
+QString nice(const QString& v)
+{
+    static const QHash<QString, QString> names = {
+        {QStringLiteral("monochrome"), QStringLiteral("Black and white")},
+        {QStringLiteral("color"), QStringLiteral("Colour")},
+        {QStringLiteral("one-sided"), QStringLiteral("One-sided")},
+        {QStringLiteral("two-sided-long-edge"), QStringLiteral("Two-sided, long edge")},
+        {QStringLiteral("two-sided-short-edge"), QStringLiteral("Two-sided, short edge")},
+        {QStringLiteral("3"), QStringLiteral("Draft")},
+        {QStringLiteral("4"), QStringLiteral("Normal")},
+        {QStringLiteral("5"), QStringLiteral("Best")},
+        {QStringLiteral("na_letter_8.5x11in"), QStringLiteral("Letter")},
+        {QStringLiteral("na_legal_8.5x14in"), QStringLiteral("Legal")},
+        {QStringLiteral("iso_a4_210x297mm"), QStringLiteral("A4")},
+        {QStringLiteral("iso_a5_148x210mm"), QStringLiteral("A5")},
+        {QStringLiteral("iso_a6_105x148mm"), QStringLiteral("A6")},
+        {QStringLiteral("na_executive_7.25x10.5in"), QStringLiteral("Executive")},
+        {QStringLiteral("na_number-10_4.125x9.5in"), QStringLiteral("Envelope #10")},
+        {QStringLiteral("iso_dl_110x220mm"), QStringLiteral("Envelope DL")},
+        {QStringLiteral("iso_c5_162x229mm"), QStringLiteral("Envelope C5")},
+        {QStringLiteral("na_monarch_3.875x7.5in"), QStringLiteral("Envelope Monarch")},
+        {QStringLiteral("jis_b5_182x257mm"), QStringLiteral("B5 (JIS)")},
+        {QStringLiteral("iso_b5_176x250mm"), QStringLiteral("B5")},
+        {QStringLiteral("na_index-3x5_3x5in"), QString::fromUtf8("Index card 3×5")},
+        {QStringLiteral("na_foolscap_8.5x13in"), QStringLiteral("Foolscap")},
+        {QStringLiteral("om_folio_210x330mm"), QStringLiteral("Folio")},
+    };
+    return names.value(v, v);
+}
+
+// print-quality is an IPP enum: ipptool names it, pycups (and lpoptions) give its number.
+QString ippValue(const QString& option, const QString& v)
+{
+    if (option != QLatin1String("print-quality"))
+        return v;
+    static const QHash<QString, QString> numbers = {
+        {QStringLiteral("draft"), QStringLiteral("3")},
+        {QStringLiteral("normal"), QStringLiteral("4")},
+        {QStringLiteral("high"), QStringLiteral("5")},
+    };
+    return numbers.value(v, v);
+}
+
+}  // namespace
+
+QList<PrintersBackend::Offered> PrintersBackend::offered(const QString& queue) const
+{
+    QList<Offered> out;
+    const auto attributes = m_attributes.constFind(queue);
+    if (attributes == m_attributes.cend())
+        return out;
+    const QHash<QString, cups::IppAttribute> a = cups::parseIppAttributes(*attributes);
+    const QHash<QString, QString> mine = m_mine.value(queue);
+    for (const PrinterOption& o : OPTIONS) {
+        const QString name = QString::fromLatin1(o.name);
+        // Riley: isinstance(sup, list) and len(sup) > 1, then the values without custom_ ones.
+        const cups::IppAttribute sup = a.value(name + QStringLiteral("-supported"));
+        if (!sup.isSet() || sup.values.size() <= 1)
+            continue;
+        Offered off;
+        off.name = name;
+        for (const QString& v : sup.values) {
+            if (!v.startsWith(QLatin1String("custom_")))
+                off.choices.append(ippValue(name, v));
+        }
+        if (off.choices.isEmpty())
+            continue;
+        // Riley: cur = mine.get(opt, default) (default: the printer's, else the first choice); index 0 when cur is
+        // not a choice.
+        const auto def = a.constFind(name + QStringLiteral("-default"));
+        const QString printerDefault = def != a.cend() ? ippValue(name, def->values.join(QLatin1Char(','))) : off.choices.first();
+        const QString cur = mine.contains(name) ? mine.value(name) : printerDefault;
+        off.value = off.choices.contains(cur) ? cur : off.choices.first();
+        out.append(off);
+    }
+#ifdef RILEY_PLANT_FAULT_SWITCH
+    // The M4 gate's planted fault: the last option offered is left out.
+    if (!out.isEmpty())
+        out.removeLast();
+#endif
+    return out;
+}
+
+QStringList PrintersBackend::optionNames(const QString& queue) const
+{
+    QStringList out;
+    for (const Offered& o : offered(queue))
+        out.append(o.name);
+    return out;
+}
+
+QStringList PrintersBackend::optionChoices(const QString& queue, const QString& option) const
+{
+    for (const Offered& o : offered(queue)) {
+        if (o.name == option)
+            return o.choices;
+    }
+    return {};
+}
+
+QStringList PrintersBackend::optionLabels(const QString& queue, const QString& option) const
+{
+    QStringList out;
+    for (const QString& c : optionChoices(queue, option))
+        out.append(nice(c));
+    return out;
+}
+
+QString PrintersBackend::optionValue(const QString& queue, const QString& option) const
+{
+    for (const Offered& o : offered(queue)) {
+        if (o.name == option)
+            return o.value;
+    }
+    return {};
+}
 
 bool PrintersBackend::knownQueue(const QString& queue) const
 {
@@ -212,6 +360,31 @@ bool PrintersBackend::refresh()
         for (const cups::Queue& q : std::as_const(queues)) {
             const CommandResult opts = runCommand({QStringLiteral("lpoptions"), QStringLiteral("-p"), q.name});
             const QHash<QString, QString> mine = opts.ok() ? cups::parseOptions(opts.out) : QHash<QString, QString>();
+            m_mine.insert(q.name, mine);
+            // What the printer supports: asked once per queue (Riley: getPrinterAttributes when the page is built);
+            // a queue that does not answer offers no options.
+            if (!m_attributes.contains(q.name) && !q.name.startsWith(QLatin1Char('-'))) {
+                const CommandResult ipp = runCommand({QStringLiteral("ipptool"), QStringLiteral("-tv"),
+                                                      QStringLiteral("ipp://localhost/printers/") + q.name,
+                                                      QStringLiteral("get-printer-attributes.test")});
+                m_attributes.insert(q.name, ipp.ok() ? ipp.out : QByteArray());
+            }
+            QVariantList offeredOptions;
+            for (const Offered& o : offered(q.name)) {
+                QStringList labels;
+                for (const QString& c : o.choices)
+                    labels.append(nice(c));
+                QVariantMap om;
+                om.insert(QStringLiteral("name"), o.name);
+                for (const PrinterOption& po : OPTIONS) {
+                    if (o.name == QLatin1String(po.name))
+                        om.insert(QStringLiteral("title"), QString::fromLatin1(po.title));
+                }
+                om.insert(QStringLiteral("choices"), o.choices);
+                om.insert(QStringLiteral("labels"), labels);
+                om.insert(QStringLiteral("value"), o.value);
+                offeredOptions.append(om);
+            }
             QVariantMap m;
             m.insert(QStringLiteral("name"), q.name);
             m.insert(QStringLiteral("info"), q.info.isEmpty() ? q.name : q.info);
@@ -222,6 +395,7 @@ bool PrintersBackend::refresh()
             m.insert(QStringLiteral("accepting"), accepting.value(q.name, false));
             m.insert(QStringLiteral("isDefault"), q.name == def);
             m.insert(QStringLiteral("colour"), mine.value(QStringLiteral("print-color-mode")));
+            m.insert(QStringLiteral("options"), offeredOptions);
             printers.append(m);
         }
         for (const cups::Job& j : jobList) {

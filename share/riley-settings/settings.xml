@@ -82,11 +82,11 @@
 
   <page id="input" title="Keyboard and Mouse" order="40" icon="input-keyboard-symbolic" widget="keyboard-mouse"
         help="Live as you change it; saves itself.">
-    <option key="input.kb_layout" label="Layout" help="One layout, or two separated by a comma (us,ro)"
+    <option key="input.kb_layout" role="kb-layout" label="Layout" help="One layout, or two separated by a comma (us,ro)"
             type="text" default="us" target="hyprland-lua greeter-sway" action="hyprland-reload greeter-sync"/>
-    <option key="input.kb_variant" label="Layout variants" help="One per layout, separated by a comma"
+    <option key="input.kb_variant" role="kb-variant" label="Layout variants" help="One per layout, separated by a comma"
             type="text" default="" target="hyprland-lua" action="hyprland-reload"/>
-    <option key="input.kb_options" label="Keyboard options" help="For example grp:alt_shift_toggle: the key that switches layouts"
+    <option key="input.kb_options" role="kb-options" label="Keyboard options" help="For example grp:alt_shift_toggle: the key that switches layouts"
             type="text" default="" target="hyprland-lua" action="hyprland-reload"/>
     <option key="input.repeat_delay" label="Delay before repeating" help="Milliseconds you hold a key before it repeats"
             type="slider" default="600" min="150" max="1000" step="10" target="hyprland-lua" action="hyprland-reload"/>
