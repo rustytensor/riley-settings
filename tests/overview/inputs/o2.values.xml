@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Case o2: only the click action set, over inputs/o2.existing.xml (a config.xml written by hand). Expected:
+     expected/o2.config.xml: <click> replaced in place; <margin>, <launcher>, the comment inside <overview> and the
+     <hot-corner> the panel does not set kept as they were, in their order; the comment before <overview> gives way
+     to the writer's own. -->
+<settings version="1">
+  <value key="overview.click">focus</value>
+</settings>

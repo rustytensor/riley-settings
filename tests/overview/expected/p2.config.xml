@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Written by Riley Settings (Overview). Elements it does not set are kept as they were. -->
+<overview xmlns="urn:riley-overview:config" version="1">
+  <click>maximize</click>
+  <hot-corner delay-ms="160"/>
+</overview>

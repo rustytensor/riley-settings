@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Case o1: every Overview option set, in an order unlike the description's, and no config.xml yet. Expected:
+     expected/o1.config.xml, by hand from riley-overview's data/config.xsd: the elements in the order click,
+     click-key, hot-corner; the attributes in the order corner, screens, delay-ms; the delay as %g (300). -->
+<settings version="1">
+  <value key="overview.hot_corner_delay">300</value>
+  <value key="overview.click">maximize</value>
+  <value key="overview.hot_corner_screens">DP-1 DP-3</value>
+  <value key="overview.click_key">g</value>
+  <value key="overview.hot_corner">top-right</value>
+</settings>

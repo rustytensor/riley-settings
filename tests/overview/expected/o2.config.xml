@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Written by Riley Settings (Overview). Elements it does not set are kept as they were. -->
+<overview xmlns="urn:riley-overview:config" version="1">
+  <!-- wider margin -->
+  <margin>40</margin>
+  <click>focus</click>
+  <launcher>fuzzel --dmenu</launcher>
+  <hot-corner corner="bottom-left"/>
+</overview>

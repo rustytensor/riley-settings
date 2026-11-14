@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Written by Riley Settings (Overview). Elements it does not set are kept as they were. -->
+<overview xmlns="urn:riley-overview:config" version="1">
+  <click-key>F</click-key>
+  <hot-corner corner="off" screens="DP-1 HDMI-A-1" delay-ms="500"/>
+</overview>

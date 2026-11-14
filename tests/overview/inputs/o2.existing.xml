@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- my overview -->
+<overview xmlns="urn:riley-overview:config" version="1">
+  <!-- wider margin -->
+  <margin>40</margin>
+  <click>fullscreen</click>
+  <launcher>fuzzel --dmenu</launcher>
+  <hot-corner corner="bottom-left"/>
+</overview>

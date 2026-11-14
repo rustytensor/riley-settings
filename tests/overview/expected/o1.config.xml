@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Written by Riley Settings (Overview). Elements it does not set are kept as they were. -->
+<overview xmlns="urn:riley-overview:config" version="1">
+  <click>maximize</click>
+  <click-key>g</click-key>
+  <hot-corner corner="top-right" screens="DP-1 DP-3" delay-ms="300"/>
+</overview>

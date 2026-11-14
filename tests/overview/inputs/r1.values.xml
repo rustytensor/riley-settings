@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Refusal r1: a screen name with a character riley-overview's schema does not allow ('#'). Expected: write fails
+     with one line, no config.xml. -->
+<settings version="1">
+  <value key="overview.hot_corner_screens">DP-1 #2</value>
+</settings>

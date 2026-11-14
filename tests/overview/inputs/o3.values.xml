@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Case o3: no Overview option set (another page's key only). Expected: the writer leaves config.xml alone, an
+     existing one byte for byte and a missing one missing. -->
+<settings version="1">
+  <value key="power.lock_after">300</value>
+</settings>
