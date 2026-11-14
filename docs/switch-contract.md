@@ -163,8 +163,8 @@ and runs no command.
 
 - Order: the targets in the order they first appear in `settings.xml` (options in file order, then their `target`
   attribute's order), only targets with a writer; a target with several files gives one line per file. With today's
-  description: `hyprland-lua`, `riley-model`, `hyprpaper`, `riley-dock` (pins, then `riley.conf`), `riley-desktop`,
-  `hypridle`.
+  description: `hyprland-lua`, `riley-model`, `hyprpaper`, `hyprland-keys`, `riley-overview`, `riley-dock` (pins,
+  then `riley.conf`), `riley-desktop`, `hypridle`.
 - Each line: `<target>\t<same|differs>\t<absolute path>`.
   `same`: the writer would leave exactly the bytes that are there (also: it would leave no file, and there is none).
   `differs`: anything else.

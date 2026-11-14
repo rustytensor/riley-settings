@@ -66,7 +66,8 @@ REAL_FILES="$REAL_HYPR/settings.json $REAL_HYPR/settings.lua $REAL_HYPR/keys-use
     $REAL_HYPR/hyprpaper.conf $REAL_HYPR/float-mode.json $REAL_HYPR/current-theme $REAL_HYPR/current-background
     $REAL_HYPR/wallpapers.json $HOME/.config/riley/desktop.json $REAL_CFG/riley/settings.xml
     $REAL_CFG/riley/fonts.toml $REAL_CFG/riley/weather.toml $REAL_CFG/riley/greeter-sway.conf
-    $REAL_CFG/nwg-dock-hyprland/riley.conf $REAL_CFG/riley-dock/config.xml $HOME/.cache/nwg-dock-pinned
+    $REAL_CFG/nwg-dock-hyprland/riley.conf $REAL_CFG/riley-dock/config.xml $REAL_CFG/riley-overview/config.xml
+    $HOME/.cache/nwg-dock-pinned
     $HOME/.cups/lpoptions $HOME/.local/bin/riley-settings $HOME/.local/bin/riley-settings-qt"
 state() { for f in $REAL_FILES; do if [ -e "$f" ] || [ -L "$f" ]; then stat -c '%n %y %s' "$f"; else echo "$f absent"; fi; done; }
 REAL_BEFORE=$(state)
@@ -105,11 +106,11 @@ declare -A SUM=(
     [expected/expected-m3.lua]=809f90340d13a2f6c6e548412ce2e2cc38812421f16cb3efa1b488802e61520c
     [expected/expected-m4.lua]=4a8973fb45b8f7abca6551a440f3ad60fa91781ed4d4f61dc71abe5366a54364
     [expected/expected-m7-idle.conf]=1fa3768be7bb83ffe7cab5eec6670bbbb6e9b08f9859fdd116c314b2eee397b4
-    [switch/expected/check-install.txt]=95c7ea66f74973746bfc80babae0d2600c10cf317e61d14ffc166fe8a3a24579
-    [switch/expected/check-m1.txt]=353db2f50ee4d3976c3df17abd07e03efcbccc60c3309f5c597e1ea698ad47cc
-    [switch/expected/check-m3.txt]=3a5147dc3d72448b4a8964b5564509027b5a745cd72b4cc1640719fc1023253c
-    [switch/expected/check-m4.txt]=08d46e892aa041f92cf6df44f3f785441863f416684571659e195a66bd4f1817
-    [switch/expected/check-real.txt]=f3af75a73c9222f85841793d2eb60b8679066ffaaf6cc0085266e687e5cccfd1
+    [switch/expected/check-install.txt]=c571ebdd69d488b17211be506c8022cefa3eae2bf04717c420845c982d466dd4
+    [switch/expected/check-m1.txt]=fe602822bb37ce551209640e97d2495320a96652c42adb362e191e05d36af7f2
+    [switch/expected/check-m3.txt]=d96ef5b099045266a72bd4e33171f1e2b0450aa6679fc4a75cefecc5b98ade23
+    [switch/expected/check-m4.txt]=553c2f8cb5e55e54fee4982209df7b662adcecb2b7cb9afbae7b49ca14f97afa
+    [switch/expected/check-real.txt]=c5620aaed5596f95d1174b1349976311ca4d9f00b78128c5e49822a4cad5c001
     [switch/expected/import-m1.values.xml]=a033389707bc0b45a14afefe39504975e3d2f8138d7af86e908e0388fcbb4181
     [switch/expected/import-m3.values.xml]=f4c8fbccd3b450f22badd8460dd642b6e30c424b0c9dff743046648b3b1f2a12
     [switch/expected/import-m4.values.xml]=ef2263eb2a33b1dcc790ec74f4ce43ef9f87279f1333fa4029d414dcdb23f067
@@ -329,7 +330,8 @@ REAL_SOURCES="$REAL_HYPR/settings.json:.config/hypr/settings.json $REAL_HYPR/set
     $REAL_HYPR/current-theme:.config/hypr/current-theme $REAL_HYPR/current-background:.config/hypr/current-background
     $REAL_HYPR/wallpapers.json:.config/hypr/wallpapers.json $HOME/.config/riley/desktop.json:.config/riley/desktop.json
     $REAL_CFG/riley/fonts.toml:.config/riley/fonts.toml $REAL_CFG/riley/weather.toml:.config/riley/weather.toml
-    $REAL_CFG/nwg-dock-hyprland/riley.conf:.config/nwg-dock-hyprland/riley.conf $HOME/.cache/nwg-dock-pinned:.cache/nwg-dock-pinned"
+    $REAL_CFG/nwg-dock-hyprland/riley.conf:.config/nwg-dock-hyprland/riley.conf $HOME/.cache/nwg-dock-pinned:.cache/nwg-dock-pinned
+    $REAL_CFG/riley-overview/config.xml:.config/riley-overview/config.xml"
 declare -A LIVE=()    # path in the throwaway home (relative) -> Marc's live file
 if [ "$built" != 1 ]; then
     fail "import-real: not built"
