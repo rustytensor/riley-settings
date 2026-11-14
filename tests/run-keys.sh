@@ -103,7 +103,7 @@ if need_bin "$label"; then
 fi
 for want in 'keys.agent_stop|keybinding|SUPER+SHIFT+Escape|hyprland-keys|hyprland-reload|Stop the desktop agent' \
             'keys.sleep|keybinding|SUPER+CTRL+Escape|hyprland-keys|hyprland-reload|Sleep' \
-            'keys.overview|keybinding|SUPER+SUPER_L|hyprland-keys|hyprland-reload|Activities overview'; do
+            'keys.overview|keybinding|SUPER+G|hyprland-keys|hyprland-reload|Activities overview'; do
     key=${want%%|*}
     label="description: $key is ${want#*|}"
     got=$(python3 -I - "$DESC" "$key" <<'PY'

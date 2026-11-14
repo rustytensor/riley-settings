@@ -129,7 +129,7 @@
       <option key="keys.sleep" label="Sleep" help="The screen locks first."
               type="keybinding" default="SUPER+CTRL+Escape" target="hyprland-keys" action="hyprland-reload"/>
       <option key="keys.overview" label="Activities overview" help="Opens the overview. Super+G by default."
-              type="keybinding" default="SUPER+SUPER_L" target="hyprland-keys" action="hyprland-reload"/>
+              type="keybinding" default="SUPER+G" target="hyprland-keys" action="hyprland-reload"/>
     </section>
   </page>
 

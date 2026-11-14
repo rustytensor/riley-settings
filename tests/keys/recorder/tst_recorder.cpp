@@ -83,8 +83,8 @@ int main(int argc, char** argv)
     if (entry)
         clickAt(w, entry, entry->width() / 2);
     QQuickItem* rec = waitFor(w, QStringLiteral("option:keys.overview"));
-    check(QStringLiteral("recorder: the Keys page shows keys.overview at its default SUPER+SUPER_L"),
-          rec && rec->property("valueText").toString() == QStringLiteral("SUPER+SUPER_L"),
+    check(QStringLiteral("recorder: the Keys page shows keys.overview at its default SUPER+G"),
+          rec && rec->property("valueText").toString() == QStringLiteral("SUPER+G"),
           rec ? QStringLiteral("valueText \"%1\"").arg(rec->property("valueText").toString())
               : QStringLiteral("no visible option:keys.overview"));
     if (!rec) {
