@@ -43,6 +43,7 @@ struct Typed {
 
 struct Field : Typed {
     QString name;
+    bool optional = false;   // optional="true": left out of an item while it equals its default
 };
 
 struct Option : Typed {

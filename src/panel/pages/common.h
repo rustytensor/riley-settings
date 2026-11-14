@@ -71,6 +71,7 @@ struct Monitor {
     double scale = 1;
     int transform = 0;
     QStringList modes;     // "availableModes": live only
+    QString format;        // "currentFormat" (XRGB2101010 is 10-bit): live only
 
     // <width>x<height>@<refreshRate %.2f>, as the values file writes a screen's mode.
     QString mode() const;

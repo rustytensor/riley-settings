@@ -387,6 +387,8 @@ void readModel(Collector* c, const QString& path, bool* hasPower)
             item.insert(QStringLiteral("enabled"), QStringLiteral("true"));
         if (!item.contains(QStringLiteral("transform")))
             item.insert(QStringLiteral("transform"), QStringLiteral("0"));
+        if (const auto t = jsonText(m.value(QStringLiteral("bitdepth"))); t && *t != QLatin1String("8"))
+            item.insert(QStringLiteral("bitdepth"), *t);   // riley 0027087; 8 is the default and stays out
         monitors.append(item);
     }
     c->list(path, QStringLiteral("display.monitors"), monitors);

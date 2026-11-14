@@ -1,0 +1,7 @@
+[
+  {"name": "HDMI-A-1", "description": "Dell Inc. DELL U2515H YKFWP4CC09VL", "disabled": false, "width": 2560, "height": 1440, "refreshRate": 59.95, "x": 0, "y": 0, "scale": 1.0, "transform": 3, "currentFormat": "XRGB8888", "availableModes": ["2560x1440@59.95Hz"]},
+  {"name": "DP-1", "description": "Samsung Electric Company S34C65xU HCNYB00237", "disabled": false, "width": 3440, "height": 1440, "refreshRate": 59.97, "x": 1440, "y": 407, "scale": 1.0, "transform": 0, "currentFormat": "XRGB2101010", "availableModes": ["3440x1440@59.97Hz"]},
+  {"name": "DP-3", "description": "Samsung Electric Company S34C65xU HCNYB00019", "disabled": false, "width": 3440, "height": 1440, "refreshRate": 59.97, "x": 4880, "y": 407, "scale": 1.0, "transform": 0, "currentFormat": "XRGB8888", "availableModes": ["3440x1440@59.97Hz"]},
+  {"name": "DP-2", "description": "GWD ARZOPA 0x37330206", "disabled": false, "width": 2560, "height": 1600, "refreshRate": 60.0, "x": 1440, "y": 1847, "scale": 1.5, "transform": 0, "currentFormat": "XRGB2101010", "availableModes": ["2560x1600@60.00Hz"]},
+  {"name": "HDMI-A-2", "description": "GWD ARZOPA 0000001504150", "disabled": true, "width": 2560, "height": 1600, "refreshRate": 60.0, "x": 4495, "y": 1847, "scale": 1.25, "transform": 0, "currentFormat": "XRGB8888", "availableModes": ["2560x1600@60.00Hz"]}
+]

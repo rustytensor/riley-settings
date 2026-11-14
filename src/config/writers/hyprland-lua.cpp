@@ -153,15 +153,21 @@ public:
             }
             const QString position = positionNumber(m.number(QStringLiteral("x"))) + QLatin1Char('x')
                 + positionNumber(m.number(QStringLiteral("y")));
-            text += QStringLiteral("hl.monitor(")
-                + luaPairs({
-                    {QStringLiteral("output"), output},
-                    {QStringLiteral("mode"), luaString(m.text(QStringLiteral("mode")))},
-                    {QStringLiteral("position"), luaString(position)},
-                    {QStringLiteral("scale"), formatNumber(m.number(QStringLiteral("scale")))},
-                    {QStringLiteral("transform"), formatNumber(m.number(QStringLiteral("transform")))},
-                })
-                + QStringLiteral(")\n");
+            QList<QPair<QString, QString>> pairs{
+                {QStringLiteral("output"), output},
+                {QStringLiteral("mode"), luaString(m.text(QStringLiteral("mode")))},
+                {QStringLiteral("position"), luaString(position)},
+                {QStringLiteral("scale"), formatNumber(m.number(QStringLiteral("scale")))},
+                {QStringLiteral("transform"), formatNumber(m.number(QStringLiteral("transform")))},
+            };
+            // Riley's core.py render (riley 0027087): bitdepth last, and only when it is not 8.
+#ifndef RILEY_PLANT_FAULT_BITDEPTH   // the bit-depth gate's planted fault: bitdepth left out
+            if (m.has(QStringLiteral("bitdepth")) && m.number(QStringLiteral("bitdepth")) != 8)
+#else
+            if (false)
+#endif
+                pairs.append({QStringLiteral("bitdepth"), formatNumber(m.number(QStringLiteral("bitdepth")))});
+            text += QStringLiteral("hl.monitor(") + luaPairs(pairs) + QStringLiteral(")\n");
         }
         text += QStringLiteral(
             "hl.monitor({ output = \"\", mode = \"preferred\", position = \"auto\", scale = \"auto\" })   -- any "

@@ -51,7 +51,9 @@ Three kinds of file, all XML. The first two are checked against an XML schema (X
   - `min`, `max`, `step`: for `slider` and `number`. The default must lie within `min`..`max` (checked by the
     loader, since XSD 1.0 cannot compare two attributes).
   - `choice` children (`value`, `label`): for `choice`. The default must be one of them.
-  - `field` children (`name`, `type`, `label`, optional `default`): for `list`; the columns of one item.
+  - `field` children (`name`, `type`, `label`, optional `default`, optional `optional="true"`): for `list`; the
+    columns of one item. An optional field is left out of an item while it equals its default, so adding one to the
+    description changes no values file.
   - `target`: the writers fed by this option, space-separated (table below).
   - `action`: what runs after a change, space-separated, from this closed list: `hyprland-reload`,
     `hypridle-restart`, `hyprpaper-reload`, `dock-reload`, `bar-reload`, `greeter-sync`, `theme-fonts` (the
@@ -113,7 +115,7 @@ then rename). Numbers are written as C's `%g` (`1.0` becomes `1`, `-0.2` stays `
 
 | Key | Type | Notes |
 |---|---|---|
-| `display.monitors` | list | fields `desc` (text), `enabled` (switch, default true), `mode` (text, `2560x1440@59.95`), `x`, `y` (number), `scale` (number), `transform` (choice 0-3, Hyprland's numbering) |
+| `display.monitors` | list | fields `desc` (text), `enabled` (switch, default true), `mode` (text, `2560x1440@59.95`), `x`, `y` (number), `scale` (number), `transform` (choice 0-3, Hyprland's numbering), `bitdepth` (choice 8 or 10, default 8, optional; `hyprland-lua` and `riley-model` write it last and only when it is 10, as Riley's core.py does since riley 0027087) |
 | `appearance.gaps_in`, `appearance.gaps_out`, `appearance.border_size`, `appearance.rounding` | slider | integers |
 | `appearance.active_opacity`, `appearance.inactive_opacity` | slider | 0 to 1 |
 | `appearance.blur`, `appearance.shadow`, `appearance.animations` | switch | |

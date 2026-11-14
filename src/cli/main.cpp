@@ -6,11 +6,13 @@
 //   riley-config check-values <description.xml> <values.xml>
 //   riley-config set <values.xml> <key> <value>
 //   riley-config write <target> --description D --values V --out FILE [--in EXISTING]
+//   riley-config edid <edid-file>      the most bits per colour the screen takes (0: the EDID does not say)
 //
 // Exit 0 on success, 1 with a one-line reason on stderr otherwise, 2 for a usage error.
 
 #include "config/config.h"
 #include "config/description.h"
+#include "config/edid.h"
 #include "config/values.h"
 #include "config/writer.h"
 
@@ -34,7 +36,8 @@ const char kUsage[] =
     "usage: riley-config validate <description.xml>\n"
     "       riley-config check-values <description.xml> <values.xml>\n"
     "       riley-config set <values.xml> <key> <value>\n"
-    "       riley-config write <target> --description D --values V --out FILE [--in EXISTING]\n";
+    "       riley-config write <target> --description D --values V --out FILE [--in EXISTING]\n"
+    "       riley-config edid <edid-file>\n";
 
 int usage()
 {
@@ -156,6 +159,17 @@ int write(const QStringList& args)
     return 0;
 }
 
+int edid(const QStringList& args)
+{
+    if (args.size() != 1)
+        return usage();
+    QFile f(args[0]);
+    if (!f.open(QIODevice::ReadOnly))
+        return fail(args[0] + QStringLiteral(": ") + f.errorString());
+    std::printf("%d\n", edidBitsPerColour(f.readAll()));
+    return 0;
+}
+
 }  // namespace
 
 int main(int argc, char** argv)
@@ -170,6 +184,7 @@ int main(int argc, char** argv)
     if (command == QLatin1String("check-values")) return checkValues(args);
     if (command == QLatin1String("set")) return set(args);
     if (command == QLatin1String("write")) return write(args);
+    if (command == QLatin1String("edid")) return edid(args);
     if (command == QLatin1String("-h") || command == QLatin1String("--help")) {
         std::fputs(kUsage, stdout);
         return 0;

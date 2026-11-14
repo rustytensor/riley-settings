@@ -150,7 +150,7 @@ public:
 
         QStringList monitors;
         for (const Item& m : config.list(QString::fromLatin1(kMonitors))) {
-            monitors << jsonObject({
+            QList<QPair<QString, QString>> fields{
                 {QStringLiteral("desc"), jsonString(m.text(QStringLiteral("desc")))},
                 {QStringLiteral("enabled"), jsonBool(m.flag(QStringLiteral("enabled")))},
                 {QStringLiteral("mode"), jsonString(m.text(QStringLiteral("mode")))},
@@ -158,7 +158,11 @@ public:
                 {QStringLiteral("y"), formatNumber(m.number(QStringLiteral("y")))},
                 {QStringLiteral("scale"), formatNumber(m.number(QStringLiteral("scale")))},
                 {QStringLiteral("transform"), formatNumber(m.number(QStringLiteral("transform")))},
-            }, l2);
+            };
+            // As Riley's model keeps it (riley 0027087): "bitdepth" last, and only when it is not 8.
+            if (m.has(QStringLiteral("bitdepth")) && m.number(QStringLiteral("bitdepth")) != 8)
+                fields.append({QStringLiteral("bitdepth"), formatNumber(m.number(QStringLiteral("bitdepth")))});
+            monitors << jsonObject(fields, l2);
         }
         top.append({QStringLiteral("monitors"), jsonArray(monitors, l1)});
 

@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "monitors": [
+    {
+      "desc": "Dell Inc. DELL U2515H YKFWP4CC09VL",
+      "enabled": true,
+      "mode": "2560x1440@59.95",
+      "x": 0,
+      "y": 0,
+      "scale": 1,
+      "transform": 3
+    },
+    {
+      "desc": "Samsung Electric Company S34C65xU HCNYB00237",
+      "enabled": true,
+      "mode": "3440x1440@59.97",
+      "x": 1440,
+      "y": 407,
+      "scale": 1,
+      "transform": 0,
+      "bitdepth": 10
+    },
+    {
+      "desc": "Samsung Electric Company S34C65xU HCNYB00019",
+      "enabled": true,
+      "mode": "3440x1440@59.97",
+      "x": 4880,
+      "y": 407,
+      "scale": 1,
+      "transform": 0,
+      "bitdepth": 10
+    },
+    {
+      "desc": "GWD ARZOPA 0x37330206",
+      "enabled": true,
+      "mode": "2560x1600@60.00",
+      "x": 1440,
+      "y": 1847,
+      "scale": 1.5,
+      "transform": 0,
+      "bitdepth": 10
+    },
+    {
+      "desc": "GWD ARZOPA 0000001504150",
+      "enabled": false,
+      "mode": "2560x1600@60.00",
+      "x": 4495,
+      "y": 1847,
+      "scale": 1.25,
+      "transform": 0
+    }
+  ]
+}

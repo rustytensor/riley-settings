@@ -2,6 +2,7 @@
 
 #include "config/atomic_file.h"
 #include "config/config.h"
+#include "config/edid.h"
 #include "config/values.h"
 #include "config/writer.h"
 
@@ -29,6 +30,13 @@ const QString kX = QStringLiteral("x");
 const QString kY = QStringLiteral("y");
 const QString kScale = QStringLiteral("scale");
 const QString kTransform = QStringLiteral("transform");
+const QString kBitdepth = QStringLiteral("bitdepth");
+
+// hyprctl's currentFormat for a screen that runs 10 bits per colour (XRGB2101010, XBGR2101010).
+bool isTenBit(const QString& format)
+{
+    return format.contains(QLatin1String("2101010"));
+}
 
 bool isOn(const QString& text)
 {
@@ -117,6 +125,9 @@ QVariantList DisplaysBackend::screens() const
         m.insert(QStringLiteral("w"), w);
         m.insert(QStringLiteral("h"), h);
         m.insert(QStringLiteral("modes"), s.modes);
+        m.insert(QStringLiteral("depths"), s.depths);
+        if (!m.contains(kBitdepth))
+            m.insert(kBitdepth, QStringLiteral("8"));
         m.insert(QStringLiteral("shown"), isOn(s.fields.value(kEnabled)));
         out.append(m);
     }
@@ -209,6 +220,8 @@ bool DisplaysBackend::load()
             s.fields.insert(kY, QString::number(m.y));
             s.fields.insert(kScale, config::formatNumber(std::round(m.scale * 100) / 100));
             s.fields.insert(kTransform, QString::number(m.transform));
+            if (isTenBit(m.format))
+                s.fields.insert(kBitdepth, QStringLiteral("10"));
             list.append(s);
         }
     }
@@ -217,6 +230,16 @@ bool DisplaysBackend::load()
             if (m.desc == s.fields.value(kDesc)) {
                 for (const QString& mode : m.modes)
                     s.modes.append(mode.endsWith(QLatin1String("Hz")) ? mode.chopped(2) : mode);
+                // A screen that runs 10-bit now while the values file says nothing (or 8) keeps its 10 bits: the
+                // values file is older than the change (made in settings.lua by hand), and Apply would undo it.
+#ifndef RILEY_PLANT_FAULT_BITDEPTH   // the bit-depth gate's planted fault: no seed from the running screen
+                if (isTenBit(m.format) && s.fields.value(kBitdepth, QStringLiteral("8")) == QLatin1String("8"))
+#else
+                if (false)
+#endif
+                    s.fields.insert(kBitdepth, QStringLiteral("10"));
+                if (config::supportedBitdepths(m.name).contains(10) || isTenBit(m.format))
+                    s.depths = {QStringLiteral("8"), QStringLiteral("10")};
             }
         }
     }
@@ -339,7 +362,7 @@ bool DisplaysBackend::setScreenField(const QString& desc, const QString& field, 
     const int i = indexOf(desc);
     if (i < 0)
         return refuse(QStringLiteral("Displays: no screen ") + desc);
-    if (field != kEnabled && field != kMode && field != kScale && field != kTransform)
+    if (field != kEnabled && field != kMode && field != kScale && field != kTransform && field != kBitdepth)
         return refuse(QStringLiteral("Displays: a screen has no setting ") + field + QStringLiteral(" to change here"));
     m_list[i].fields.insert(field, text);
     updateDerived();

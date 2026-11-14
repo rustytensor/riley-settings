@@ -635,6 +635,8 @@ QByteArray editListValue(const QByteArray& data, const Option& option, const QLi
             e += indent + "  <item";
             for (const Field& f : option.fields) {
                 const QString v = item.contains(f.name) ? item.value(f.name) : f.defaultValue.value_or(QString());
+                if (f.optional && v == f.defaultValue.value_or(QString()))
+                    continue;
                 e += ' ' + f.name.toUtf8() + "=\"" + escapeAttr(v) + '"';
             }
             e += "/>" + newline;

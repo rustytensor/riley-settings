@@ -214,6 +214,7 @@ std::unique_ptr<Description> Description::load(const QString& path, const QStrin
             Field f;
             readTyped(c, &f);
             f.name = xml::attr(c, "name");
+            f.optional = xml::attr(c, "optional") == QLatin1String("true");
             o.fields.append(f);
         }
         d->m_options.push_back(std::move(o));

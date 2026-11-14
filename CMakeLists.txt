@@ -13,6 +13,7 @@ option(RILEY_PLANT_FAULT_PANEL "Plant the gate's fault in the panel's bindings (
 option(RILEY_PLANT_FAULT_PAGES "Plant the M3 gate's faults in the custom pages (tests only)" OFF)
 # The M4 gate's planted faults (docs/switch-contract.md, "The planted faults").
 option(RILEY_PLANT_FAULT_KEYS "Plant the keys gate's faults: hyprland-keys ignores the values file, the recorder drops Super alone (tests only)" OFF)
+option(RILEY_PLANT_FAULT_BITDEPTH "Plant the bit-depth gate's faults: no bitdepth in settings.lua, no HDMI deep colour, no 10-bit seed (tests only)" OFF)
 option(RILEY_PLANT_FAULT_SWITCH "Plant the M4 gate's faults in the import, the layout picker and the printer options (tests only)" OFF)
 
 include(GNUInstallDirs)
@@ -32,6 +33,8 @@ add_library(riley-config-core STATIC
     src/config/config.h
     src/config/description.cpp
     src/config/description.h
+    src/config/edid.cpp
+    src/config/edid.h
     src/config/import.cpp
     src/config/import.h
     src/config/values.cpp
@@ -138,6 +141,11 @@ target_link_libraries(riley-settings-panel
 if(RILEY_PLANT_FAULT_PANEL)
     message(WARNING "RILEY_PLANT_FAULT_PANEL is ON: the second option is bound to the third option's key (gate builds only)")
     target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_PANEL)
+endif()
+if(RILEY_PLANT_FAULT_BITDEPTH)
+    message(WARNING "RILEY_PLANT_FAULT_BITDEPTH is ON: the bit-depth gate's planted faults (gate builds only)")
+    target_compile_definitions(riley-config-core PRIVATE RILEY_PLANT_FAULT_BITDEPTH)
+    target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_BITDEPTH)
 endif()
 if(RILEY_PLANT_FAULT_KEYS)   # and in the panel: the key recorder does not take Super pressed alone
     target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_KEYS)

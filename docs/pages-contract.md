@@ -95,7 +95,14 @@ holds `job-hold-until-specified`.
 
 The screens: `display.monitors` from the values file when it is set, else the list Hyprland gives (`hyprctl monitors
 all -j`, in its order: `desc` = `description`, `enabled` = not `disabled`, `mode` = `<width>x<height>@<refreshRate
-%.2f>`, `x`, `y`, `scale` rounded to 2 places, `transform`). Live-only fields (port name, modes) are never saved.
+%.2f>`, `x`, `y`, `scale` rounded to 2 places, `transform`, `bitdepth` 10 when `currentFormat` holds `2101010`).
+Live-only fields (port name, modes, depths) are never saved.
+
+- **Colour depth:** `bitdepth` is the values file's, except that a screen running 10-bit now (`currentFormat` holds
+  `2101010`) while the values file says 8 or nothing shows 10, so Apply does not undo a change made in settings.lua.
+  `depths` offers "8", plus "10" when the EDID in `$RILEY_DRM_DIR` (default `/sys/class/drm`) `/card*-<port>/edid`
+  gives 10 or more bits per colour (EDID 1.4 byte 20, or the HDMI block's DC_30bit) or the screen runs 10-bit now.
+  Hyprland takes only 8 and 10. Gate: `tests/run-bitdepth.sh`.
 
 - One item **`screen:<desc>`** per enabled screen, drawn to scale; properties **`screenX`**, **`screenY`**: its place
   in the arrangement being edited, in logical pixels.

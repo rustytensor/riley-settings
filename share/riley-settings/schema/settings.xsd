@@ -110,6 +110,8 @@
     <xs:attribute name="min" type="xs:decimal"/>
     <xs:attribute name="max" type="xs:decimal"/>
     <xs:attribute name="step" type="xs:decimal"/>
+    <!-- true: the field is left out of a list item while it equals its default, so adding it changes no file. -->
+    <xs:attribute name="optional" type="xs:boolean"/>
   </xs:complexType>
 
   <xs:complexType name="option">

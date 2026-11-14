@@ -25,8 +25,9 @@ class DisplaysBackend : public PageBackend {
     Q_PROPERTY(bool pending READ pending NOTIFY changed)
     Q_PROPERTY(int keepSeconds READ keepSeconds NOTIFY changed)
     Q_PROPERTY(int secondsLeft READ secondsLeft NOTIFY changed)
-    // Every screen, in list order: {desc, enabled, mode, x, y, scale, transform (texts), w, h (logical size, 0 when
-    // the mode or scale cannot be read), modes (live, from hyprctl), shown (enabled)}.
+    // Every screen, in list order: {desc, enabled, mode, x, y, scale, transform, bitdepth (texts), w, h (logical
+    // size, 0 when the mode or scale cannot be read), modes (live, from hyprctl), depths (the bit depths offered:
+    // "8", and "10" when the screen's EDID allows it or it runs 10-bit now), shown (enabled)}.
     Q_PROPERTY(QVariantList screens READ screens NOTIFY changed)
     // The descriptions of the enabled screens, and of every screen: changed only when the set changes, so the
     // page's items are not made again during a drag.
@@ -67,6 +68,7 @@ private:
     struct Screen {
         QHash<QString, QString> fields;   // the list option's fields, as text
         QStringList modes;                // live only, never saved
+        QStringList depths{QStringLiteral("8")};   // live only, never saved
     };
     struct Remembered {
         QString path;

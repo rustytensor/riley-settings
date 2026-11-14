@@ -100,6 +100,7 @@ bool hyprMonitors(bool all, QList<Monitor>* out, QString* error)
         m.y = o.value(QStringLiteral("y")).toInt();
         m.scale = o.value(QStringLiteral("scale")).toDouble(1);
         m.transform = o.value(QStringLiteral("transform")).toInt();
+        m.format = o.value(QStringLiteral("currentFormat")).toString();
         for (const QJsonValue& mode : o.value(QStringLiteral("availableModes")).toArray())
             m.modes.append(mode.toString());
         out->append(m);

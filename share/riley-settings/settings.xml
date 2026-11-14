@@ -22,6 +22,12 @@
         <choice value="2" label="180°"/>
         <choice value="3" label="270°"/>
       </field>
+      <!-- Hyprland takes only 8 and 10 (bitdepth in hl.monitor). The page offers 10 where the screen's EDID allows it.
+           Optional: left out of the values file while 8, as Riley's core.py (riley 0027087) leaves it out. -->
+      <field name="bitdepth" type="choice" default="8" optional="true" label="Colour depth">
+        <choice value="8" label="8-bit"/>
+        <choice value="10" label="10-bit"/>
+      </field>
     </option>
   </page>
 

@@ -296,6 +296,22 @@ Item {
                             currentIndex: box.data_ ? Number(box.data_.transform) % 4 : 0
                             onActivated: i => root.setScreenField(box.modelData, "transform", String(i))
                         }
+
+                        Label { Layout.fillWidth: true; text: qsTr("Colour depth") }
+                        ComboBox {
+                            Layout.preferredWidth: 220
+                            readonly property var depths: {
+                                const list = box.data_ ? box.data_.depths.slice() : ["8"]
+                                const cur = box.data_ ? box.data_.bitdepth : "8"
+                                if (list.indexOf(cur) < 0)
+                                    list.push(cur)
+                                return list
+                            }
+                            model: depths.map(d => qsTr("%1-bit").arg(d))
+                            enabled: depths.length > 1
+                            currentIndex: box.data_ ? depths.indexOf(box.data_.bitdepth) : 0
+                            onActivated: i => root.setScreenField(box.modelData, "bitdepth", depths[i])
+                        }
                     }
                 }
             }
