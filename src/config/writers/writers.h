@@ -15,5 +15,6 @@ std::unique_ptr<Writer> makeRileyModel();    // riley-model.cpp: ~/.config/hypr/
 std::unique_ptr<Writer> makeRileyDock();     // riley-dock.cpp: the dock's pins file and riley.conf (own files)
 std::unique_ptr<Writer> makeRileyDesktop();  // riley-desktop.cpp: ~/.config/riley/desktop.json (own file)
 std::unique_ptr<Writer> makeHyprlandKeys();  // hyprland-keys.cpp: ~/.config/hypr/keys-user.lua
+std::unique_ptr<Writer> makeRileyOverview(); // riley-overview.cpp: ~/.config/riley-overview/config.xml
 
 }  // namespace riley::config::writers

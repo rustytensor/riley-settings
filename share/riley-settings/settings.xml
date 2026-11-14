@@ -133,6 +133,38 @@
     </section>
   </page>
 
+  <!-- riley-overview's own options (its data/config.xsd): what a click on a window does, the key that does it for the
+       highlighted window, and the hot corner. A change writes ~/.config/riley-overview/config.xml and restarts
+       riley-overview.service. The key that opens the overview is on the Keys page (keys.overview). -->
+  <page id="overview" title="Overview" order="47" icon="view-grid-symbolic">
+    <section title="Windows" help="The overview shows every window of the screen side by side.">
+      <option key="overview.click" label="Click on a window" help="What a click does after the overview closes"
+              type="choice" default="fullscreen" target="riley-overview" action="overview-restart">
+        <choice value="fullscreen" label="Make it full screen"/>
+        <choice value="maximize" label="Maximize it (the bar stays)"/>
+        <choice value="focus" label="Only bring it to the front"/>
+      </option>
+      <option key="overview.click_key" label="Key for the highlighted window"
+              help="One letter or digit; inside the overview it does the click action while the search is empty"
+              type="text" default="F" target="riley-overview" action="overview-restart"/>
+    </section>
+    <section title="Hot corner" help="Push the pointer into a screen corner to open the overview; push again to close it.">
+      <option key="overview.hot_corner" label="Hot corner" type="choice" default="top-left"
+              target="riley-overview" action="overview-restart">
+        <choice value="top-left" label="Top left"/>
+        <choice value="top-right" label="Top right"/>
+        <choice value="bottom-left" label="Bottom left"/>
+        <choice value="bottom-right" label="Bottom right"/>
+        <choice value="off" label="Off"/>
+      </option>
+      <option key="overview.hot_corner_screens" label="Hot corner screens"
+              help="all, primary, or screen names separated by spaces (DP-1 HDMI-A-1)"
+              type="text" default="all" target="riley-overview" action="overview-restart"/>
+      <option key="overview.hot_corner_delay" label="Hot corner delay" help="Milliseconds the pointer stays in the corner"
+              type="slider" default="150" min="50" max="1000" step="10" target="riley-overview" action="overview-restart"/>
+    </section>
+  </page>
+
   <page id="theme" title="Theme and Wallpaper" order="50" icon="preferences-desktop-wallpaper-symbolic"
         widget="theme-wallpaper"
         help="Drag a picture onto a screen to use it there; click a picture to use it on every screen.">

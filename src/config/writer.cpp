@@ -24,6 +24,7 @@ const std::vector<std::unique_ptr<Writer>>& registry()
         w.push_back(writers::makeRileyDock());
         w.push_back(writers::makeRileyDesktop());
         w.push_back(writers::makeHyprlandKeys());
+        w.push_back(writers::makeRileyOverview());
         return w;
     }();
     return writers;
@@ -39,6 +40,7 @@ constexpr TargetFile kTargetFiles[] = {
     {"hyprpaper", "hypr/hyprpaper.conf"},
     {"hyprland-lua", "hypr/settings.lua"},
     {"hyprland-keys", "hypr/keys-user.lua"},   // read by Riley's hypr/keys.lua (riley bf5b0fb)
+    {"riley-overview", "riley-overview/config.xml"},   // read by riley-overview at its start
     // Riley's model (the old GTK panel's file), which riley-greeter-sync.path watches for the login screen.
     {"riley-model", "hypr/settings.json"},
     {"greeter-sway", "riley/greeter-sway.conf"},   // riley-config and the M1 gate only; no option names it

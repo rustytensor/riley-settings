@@ -63,6 +63,7 @@
       <xs:enumeration value="fonts"/>          <!-- the font overrides (hypr-theme fonts) -->
       <xs:enumeration value="weather"/>        <!-- the bar's weather settings -->
       <xs:enumeration value="float-mode"/>     <!-- hypr-float-mode's default -->
+      <xs:enumeration value="riley-overview"/> <!-- ~/.config/riley-overview/config.xml -->
     </xs:restriction>
   </xs:simpleType>
   <xs:simpleType name="targets">
@@ -83,6 +84,7 @@
       <xs:enumeration value="greeter-sync"/>
       <xs:enumeration value="theme-fonts"/>
       <xs:enumeration value="desktop-reload"/>
+      <xs:enumeration value="overview-restart"/>
       <xs:enumeration value="none"/>
     </xs:restriction>
   </xs:simpleType>

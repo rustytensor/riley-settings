@@ -48,6 +48,12 @@ const ActionArgv kActions[] = {
     {"theme-fonts", {"hypr-theme", "--fonts"}},
     // hypr-desktop-menu carries the desktop boxes; a new start replaces the old one (by its PID file).
     {"desktop-reload", {"hyprctl", "dispatch", "hl.dsp.exec_cmd(\"hypr-desktop-menu\")"}},
+    // riley-overview reads its config.xml when it starts; the user service is restarted to take a change.
+#ifndef RILEY_PLANT_FAULT_OVERVIEW
+    {"overview-restart", {"systemctl", "--user", "restart", "riley-overview.service"}},
+#else
+    {"overview-restart", {}},   // the overview gate's planted fault: the restart runs nothing
+#endif
 };
 
 const ActionArgv* findAction(const QString& name)

@@ -14,6 +14,7 @@ option(RILEY_PLANT_FAULT_PAGES "Plant the M3 gate's faults in the custom pages (
 # The M4 gate's planted faults (docs/switch-contract.md, "The planted faults").
 option(RILEY_PLANT_FAULT_KEYS "Plant the keys gate's faults: hyprland-keys ignores the values file, the recorder drops Super alone (tests only)" OFF)
 option(RILEY_PLANT_FAULT_BITDEPTH "Plant the bit-depth gate's faults: no bitdepth in settings.lua, no HDMI deep colour, no 10-bit seed (tests only)" OFF)
+option(RILEY_PLANT_FAULT_OVERVIEW "Plant the overview gate's faults: riley-overview drops the elements it does not set, its restart runs nothing (tests only)" OFF)
 option(RILEY_PLANT_FAULT_SWITCH "Plant the M4 gate's faults in the import, the layout picker and the printer options (tests only)" OFF)
 
 include(GNUInstallDirs)
@@ -54,6 +55,7 @@ add_library(riley-config-core STATIC
     src/config/writers/desktop-layout.cpp
     src/config/writers/desktop-layout.h
     src/config/writers/hyprland-keys.cpp
+    src/config/writers/riley-overview.cpp
 )
 target_include_directories(riley-config-core PUBLIC src)
 target_link_libraries(riley-config-core PUBLIC Qt6::Core PRIVATE LibXml2::LibXml2)
@@ -61,6 +63,10 @@ target_compile_definitions(riley-config-core PUBLIC QT_NO_KEYWORDS QT_NO_CAST_FR
 if(RILEY_PLANT_FAULT_KEYS)
     message(WARNING "RILEY_PLANT_FAULT_KEYS is ON: hyprland-keys ignores the values file (gate builds only)")
     target_compile_definitions(riley-config-core PRIVATE RILEY_PLANT_FAULT_KEYS)
+endif()
+if(RILEY_PLANT_FAULT_OVERVIEW)
+    message(WARNING "RILEY_PLANT_FAULT_OVERVIEW is ON: riley-overview drops the elements it does not set (gate builds only)")
+    target_compile_definitions(riley-config-core PRIVATE RILEY_PLANT_FAULT_OVERVIEW)
 endif()
 if(RILEY_PLANT_FAULT)
     message(WARNING "RILEY_PLANT_FAULT is ON: writers drop the second line of their output (gate builds only)")
@@ -146,6 +152,9 @@ if(RILEY_PLANT_FAULT_BITDEPTH)
     message(WARNING "RILEY_PLANT_FAULT_BITDEPTH is ON: the bit-depth gate's planted faults (gate builds only)")
     target_compile_definitions(riley-config-core PRIVATE RILEY_PLANT_FAULT_BITDEPTH)
     target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_BITDEPTH)
+endif()
+if(RILEY_PLANT_FAULT_OVERVIEW)   # and in the panel: overview-restart runs nothing
+    target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_OVERVIEW)
 endif()
 if(RILEY_PLANT_FAULT_KEYS)   # and in the panel: the key recorder does not take Super pressed alone
     target_compile_definitions(riley-settings-panel PRIVATE RILEY_PLANT_FAULT_KEYS)

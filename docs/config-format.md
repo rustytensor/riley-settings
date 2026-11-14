@@ -57,7 +57,8 @@ Three kinds of file, all XML. The first two are checked against an XML schema (X
   - `target`: the writers fed by this option, space-separated (table below).
   - `action`: what runs after a change, space-separated, from this closed list: `hyprland-reload`,
     `hypridle-restart`, `hyprpaper-reload`, `dock-reload`, `bar-reload`, `greeter-sync`, `theme-fonts` (the
-    theme's fonts and your font choices, applied again), `desktop-reload` (the desktop boxes, restarted), `none`.
+    theme's fonts and your font choices, applied again), `desktop-reload` (the desktop boxes, restarted),
+    `overview-restart` (`systemctl --user restart riley-overview.service`), `none`.
     Never a shell line.
 
 What XSD checks: element structure, the type list, required `key`, unique `key` (`xs:unique`), the action list,
@@ -99,6 +100,7 @@ then rename). Numbers are written as C's `%g` (`1.0` becomes `1`, `-0.2` stays `
 | `hyprpaper` | `~/.config/hypr/hyprpaper.conf` | whole | `wallpaper.picture`, `wallpaper.screens`, `display.monitors` |
 | `greeter-sway` | the login screen's sway file (installed by `riley-greeter-sync`) | whole | `display.monitors`, `input.kb_layout` |
 | `hyprland-keys` | `~/.config/hypr/keys-user.lua` (read by Riley's `hypr/keys.lua`) | whole; removed when no key is set | `keys.agent_stop`, `keys.sleep` |
+| `riley-overview` | `~/.config/riley-overview/config.xml` (read by riley-overview at its start) | its own elements; left alone when no key is set | `overview.*` |
 
 - `hyprland-lua` writes only the keys your values file sets; everything else falls back to `hyprland.lua`. The
   Displays part is always written. Appearance and Keyboard-and-mouse appear only when one of their keys is set.
@@ -108,6 +110,13 @@ then rename). Numbers are written as C's `%g` (`1.0` becomes `1`, `-0.2` stays `
 - `hyprland-keys` writes only the keys your values file sets, in the description's order, as a Lua table from option
   key to binding (`["keys.sleep"] = "SUPER+CTRL+Escape",`); `\` and `"` are escaped, control bytes become `\ddd`. A
   key left out keeps Riley's default. With no key set the file is removed, which also keeps every default.
+- `riley-overview` writes only what the Overview page sets: `<click>`, `<click-key>` and the attributes of
+  `<hot-corner>` (`corner`, `screens`, `delay-ms`) whose keys are set. Every other element, comment and attribute
+  inside an existing `<overview>` is kept as it was, in its order; a set element replaces the old one in place or goes
+  at the end. Screens may be typed with spaces or commas and are written with single spaces; an empty click key or
+  screens keeps the overview's default. A value the overview's schema would not take, an existing file that is not
+  riley-overview's or not well-formed, and a result that the installed schema (`$XDG_DATA_HOME/riley-overview/
+  config.xsd`, then `$XDG_DATA_DIRS`) rejects are refused: nothing is written and the panel shows the reason.
 - `hyprpaper`: one block per enabled screen of `display.monitors`, in list order, each with that screen's picture
   from `wallpaper.screens` or else `wallpaper.picture`. With no per-screen picture, one catch-all block.
 
