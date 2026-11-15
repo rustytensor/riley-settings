@@ -11,6 +11,7 @@ ApplicationWindow {
     property int current: 0
     readonly property PageItem page: panel.pages.length > current ? panel.pages[current] as PageItem : null
 
+    visible: true    // a QML window starts hidden; nothing else shows it
     width: 1100
     height: 780
     minimumWidth: 720
